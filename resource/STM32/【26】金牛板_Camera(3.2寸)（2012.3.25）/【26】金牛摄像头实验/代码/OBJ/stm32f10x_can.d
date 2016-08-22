@@ -1,0 +1,10 @@
+.\OBJ\stm32f10x_can.o: Source\STM32F10x_StdPeriph_Driver\src\stm32f10x_can.c
+.\OBJ\stm32f10x_can.o: .\Source\STM32F10x_StdPeriph_Driver\inc\stm32f10x_can.h
+.\OBJ\stm32f10x_can.o: .\Source\CMSIS\Core\CM3\stm32f10x.h
+.\OBJ\stm32f10x_can.o: .\Source\CMSIS\Core\CM3\core_cm3.h
+.\OBJ\stm32f10x_can.o: C:\MDK\ARM\RV31\INC\stdint.h
+.\OBJ\stm32f10x_can.o: .\Source\CMSIS\Core\CM3\system_stm32f10x.h
+.\OBJ\stm32f10x_can.o: .\Source\User\stm32f10x_conf.h
+.\OBJ\stm32f10x_can.o: .\Source\STM32F10x_StdPeriph_Driver\inc\stm32f10x_gpio.h
+.\OBJ\stm32f10x_can.o: .\Source\CMSIS\Core\CM3\stm32f10x.h
+.\OBJ\stm32f10x_can.o: .\Source\STM32F10x_StdPeriph_Driver\inc\stm32f10x_rcc.h

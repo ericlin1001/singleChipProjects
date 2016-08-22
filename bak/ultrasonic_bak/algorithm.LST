@@ -1,0 +1,51 @@
+C51 COMPILER V9.01   ALGORITHM                                                             08/15/2013 07:56:31 PAGE 1   
+
+
+C51 COMPILER V9.01, COMPILATION OF MODULE ALGORITHM
+OBJECT MODULE PLACED IN algorithm.OBJ
+COMPILER INVOKED BY: J:\Keil\C51\BIN\C51.EXE algorithm.c BROWSE DEBUG OBJECTEXTEND TABS(2)
+
+line level    source
+
+   1          #include "algorithm.h"
+   2          /****************algorithm***********************/
+   3          static void swap(QuickSortType *a,int i,int j){*(a+i)^=*(a+j)^=*(a+i)^=*(a+j);}
+   4          
+   5          void quicksort(QuickSortType *array, int n)
+   6          {
+   7   1        if(n>1){
+   8   2          int pivot=0,j;
+   9   2          for(j=1;j<n;j++)
+  10   2            if(array[j]<array[0])
+  11   2              swap(array,++pivot,j);
+  12   2          if(pivot!=0)swap(array,0,pivot);
+  13   2          quicksort(array,pivot);
+  14   2          quicksort(array+pivot+1,n-pivot-1);
+  15   2        }
+  16   1      }
+  17          void copyArr(QuickSortType *from,QuickSortType *to,int n){
+  18   1        while(n--)*to++=*from++;
+  19   1      }
+  20          long abs(long a){if(a<0)return -a;return a;}
+  21          long abs2(long a,long b){if(a>b)return a-b;return b-a;}
+  22          char sign(long a){if(a>0)return 1;if(a<0)return -1;return 0;}
+  23          ulong sumArr(ulong *arr,uchar size){
+  24   1        uchar i,temp=0;
+  25   1        for(i=0;i<size;i++)temp+=arr[i];
+  26   1        return temp;
+  27   1      }
+  28          /****************end algorithm***********************/
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    719    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----      46
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

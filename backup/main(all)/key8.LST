@@ -1,0 +1,159 @@
+C51 COMPILER V9.01   KEY8                                                                  06/14/2013 04:14:01 PAGE 1   
+
+
+C51 COMPILER V9.01, COMPILATION OF MODULE KEY8
+OBJECT MODULE PLACED IN key8.OBJ
+COMPILER INVOKED BY: J:\Keil\C51\BIN\C51.EXE key8.c BROWSE DEBUG OBJECTEXTEND
+
+line level    source
+
+   1          #include "header.h"
+   2          #include "led.h"
+   3          #include "key8.h"
+   4          /***********************key***************/
+   5          static uchar keyPressCount[8];
+   6          static uchar lastKeys=0xff;
+   7          void processKey(){
+   8   1              uchar curKeys=Keys;
+   9   1              uchar i;
+  10   1              lastKeys=lastKeys & ~curKeys;//trigger by press down.
+  11   1              for(i=0;i<8;i++){
+  12   2                      if(lastKeys & (1<<i)){
+  13   3                              keyPressCount[i]++;
+  14   3                              if(keyPressCount[i]>KEY_COUNT_MAX*2)keyPressCount[i]=KEY_COUNT_MAX;
+  15   3                      }
+  16   2              }
+  17   1              lastKeys=curKeys;
+  18   1      }
+  19          BOOL isKeyDown(uchar i){
+  20   1              return (lastKeys&(1<<i))==0;
+  21   1      }
+  22          BOOL isKeyUp(uchar i){
+  23   1              return (lastKeys&(1<<i))>0;
+  24   1      }
+  25          BOOL isKeyRelease(uchar i){
+  26   1              if(keyPressCount[i]>0 && (lastKeys&(1<<i))>0){
+  27   2                      keyPressCount[i]--;
+  28   2                      return TRUE;
+  29   2              }
+  30   1              return FALSE;
+  31   1      }
+  32          BOOL isKeyPress(uchar i){
+  33   1              if(keyPressCount[i]>0){
+  34   2                      keyPressCount[i]--;
+  35   2                      return TRUE;
+  36   2              }
+  37   1              return FALSE;
+  38   1      }
+  39          void clearKeyCount(){
+  40   1              uchar i;
+  41   1              for(i=0;i<8;i++){
+  42   2                      keyPressCount[i]=0;
+  43   2              }
+  44   1      }
+  45          /***********************end key***************/
+  46          #define _DO_TEST
+  47          /**************test some thing****/
+  48          #ifdef main
+              #undef main
+              #endif
+  51          #define main test_main
+  52          #ifdef main
+  53          
+  54          #endif
+  55          #ifdef main
+C51 COMPILER V9.01   KEY8                                                                  06/14/2013 04:14:01 PAGE 2   
+
+  56          #undef main
+  57          #endif
+  58          /************end test****/
+  59          
+  60          static int num=0x03;
+  61          void moveLEDLeft(){
+  62   1              num=_crol_(num,1);
+  63   1              LED_show(num);
+  64   1      }
+  65          void moveLEDRight(){
+  66   1              num=_cror_(num,1);
+  67   1              LED_show(num);
+  68   1      }
+  69          
+  70          
+  71          static void init(){
+  72   1      num=0x03;
+  73   1      P1=0;
+  74   1      }
+  75          
+  76          static void mainLoop(){
+  77   1      #define SELECT 1
+  78   1      
+  79   1      #if SELECT==3
+                      if(isKeyPress(7)){
+                              P1++;
+                              //LED_show(num++);
+                      }
+              #endif
+  85   1      
+  86   1      #if SELECT==2
+                      uchar i;
+                      for(i=0;i<8;i++){
+                              if(isKeyPress(i)){
+                                      LED_show(1<<i);
+                              }
+                      }
+              #endif
+  94   1      #if SELECT==1
+  95   1              if(isKeyPress(0)){
+  96   2                      moveLEDLeft();
+  97   2              }
+  98   1              if(isKeyPress(1)){
+  99   2                      moveLEDRight();
+ 100   2              }
+ 101   1              if(isKeyDown(2)){
+ 102   2                      num++;
+ 103   2                      LED_show(num);
+ 104   2                      delay(300);
+ 105   2              }
+ 106   1      #endif
+ 107   1      
+ 108   1      #if SELECT==0
+                      uchar i;
+                      for(i=0;i<8;i++){
+                              if(isKeyRelease(i)){
+                                      num^=(1<<i);
+                              }
+                      }
+                      LED_show(num);
+                      return ;
+              #endif
+C51 COMPILER V9.01   KEY8                                                                  06/14/2013 04:14:01 PAGE 3   
+
+ 118   1      
+ 119   1      }
+ 120          
+ 121          int key8_main(){
+ 122   1      #ifdef DO_TEST
+              test_main();
+              #endif
+ 125   1              init();
+ 126   1              while(1)
+ 127   1              {
+ 128   2                      processKey();
+ 129   2                      mainLoop();
+ 130   2              }
+ 131   1              return 0;
+ 132   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    300    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =     11    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

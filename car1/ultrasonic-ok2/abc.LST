@@ -1,0 +1,360 @@
+C51 COMPILER V9.01   ABC                                                                   08/15/2013 07:33:13 PAGE 1   
+
+
+C51 COMPILER V9.01, COMPILATION OF MODULE ABC
+OBJECT MODULE PLACED IN abc.OBJ
+COMPILER INVOKED BY: J:\Keil\C51\BIN\C51.EXE abc.c BROWSE DEBUG OBJECTEXTEND TABS(2)
+
+line level    source
+
+   1          //ultransonic-byEric.cpp
+   2          //曾吉申～ 可以直接复制这里的。。。
+   3          /***
+   4          TMOD:
+   5          T1                T0
+   6          GATE C/~T M1 M0 | GATE C/~T M1 M0 | 
+   7          
+   8          M1M0: 
+   9          00  13bit-counter,N=13
+  10          01   16bit-counter,N=16
+  11          10   2 8bit-counter,auto initialized with initial value,N=8
+  12          11   2 8bit-counter,only for T0,N=8
+  13          
+  14          
+  15          C/~T:
+  16          0: counter the machine period,used for timer.
+  17          1: counter the pulse in T0,T1 pin. negative pulse is valid.
+  18          
+  19          
+  20          GATE:
+  21          0: only controlled by TR0/TR1
+  22          1: controlled by both of TR0/TR1 and INT0/INT1
+  23          */
+  24          /*
+  25          IP:interrup priority
+  26          IP bit: 4 3  2   1   0
+  27          PS  PT1  PX1 PT0 PT0
+  28          1:is high priority, 0 is lower priority.
+  29          
+  30          TCON: timer,externel interrup control register.
+  31          7~0
+  32          7    6    5    4    3   2  1   0
+  33          TF1  TR1  TF0 TR0 IE1 IT1 IE0 IT0
+  34          TF1:timer1 overflow request.
+  35          IE1:interrupt externel 1 request.
+  36          IT1:~INT1 control bit. 1: is edged triggered. 0:TLL level triggered.
+  37          
+  38          IE:interrupt enable.
+  39          7~0
+  40          7  4  3   2   1   0
+  41          EA ES ET1 EX1 ET0 EX0 
+  42          EA: enable all interrup. 1 allows all interrup.
+  43          ES:serial int enable  
+  44          ET1:timer1 enable
+  45          EX1:externel enable.
+  46          */
+  47          #include <reg52.h>  
+  48          sbit P10=P1^0;
+  49          sbit P11=P1^1;
+  50          
+  51          #define uchar unsigned char //稓义一下窚便使用
+  52          #define uint  unsigned int
+  53          #define ulong unsigned long
+  54          //***********************************************
+  55          
+C51 COMPILER V9.01   ABC                                                                   08/15/2013 07:33:13 PAGE 2   
+
+  56          typedef ulong TimeType;
+  57          /****************algorithm***********************/
+  58          typedef TimeType QuickSortType; 
+  59          void swap(QuickSortType *a,int i,int j){*(a+i)^=*(a+j)^=*(a+i)^=*(a+j);}
+  60          void quicksort(QuickSortType *array, int n);
+  61          void copyArr(QuickSortType *from,QuickSortType *to,int n);
+  62          void quicksort(QuickSortType *array, int n)
+  63          {
+  64   1        if(n>1){
+  65   2          int pivot=0,j;
+  66   2          for(j=1;j<n;j++)
+  67   2            if(array[j]<array[0])
+  68   2              swap(array,++pivot,j);
+  69   2          if(pivot!=0)swap(array,0,pivot);
+  70   2          quicksort(array,pivot);
+  71   2          quicksort(array+pivot+1,n-pivot-1);
+  72   2        }
+  73   1      }
+  74          void copyArr(QuickSortType *from,QuickSortType *to,int n){
+  75   1        while(n--)*to++=*from++;
+  76   1      }
+  77          /****************end algorithm***********************/
+  78          
+  79          
+  80          /**********************Leds control******************/
+  81          #define Num_LEDs 8
+  82          #define LED_DATA  P0
+  83          #define LED_SELECT  P1
+  84          uchar ledOutputBuffer[Num_LEDs];// the data have been translated.
+  85          uchar ledIndex[8]={0,1,2,3,4,5,6,7} ;//this control which leds to be used.
+  86          uchar pLed=0;//just a pointer,used by refreshLeds.
+  87          uchar code SEG7[10]={0xC0,0xF9,0xA4,0xB0,0x99,0x92,0x82,0xF8,0x80,0x90};//7seg-leds translating table 0-9
+  88          //*************
+  89          void initLeds();
+  90          void showNumInLeds(ulong num);
+  91          void refreshLeds();
+  92          //*************
+  93          void showNumInLeds(ulong num){
+  94   1        uchar i=0;
+  95   1        for(i=0;i<Num_LEDs;i++){
+  96   2          ledOutputBuffer[i]=SEG7[num%10];
+  97   2          num/=10;
+  98   2          if(num==0)break;
+  99   2        }
+ 100   1        //turn off Zero's leds.
+ 101   1        for(i++;i<Num_LEDs;i++) ledOutputBuffer[i]=0xff;
+ 102   1      }
+ 103          void refreshLeds(){
+ 104   1        /*  recommended timer dealy setting:
+ 105   1            TH0=0xff-0x07;
+ 106   1            TL0=0xff-0x00;   
+ 107   1            */
+ 108   1        LED_SELECT=ledIndex[7-pLed];
+ 109   1        LED_DATA=~ledOutputBuffer[pLed];     
+ 110   1        //
+ 111   1        pLed++;
+ 112   1        if(pLed>=Num_LEDs)pLed-=Num_LEDs;
+ 113   1      }
+ 114          /**********************end Leds control******************/
+ 115          
+ 116          
+ 117          void initUltrasonic();
+C51 COMPILER V9.01   ABC                                                                   08/15/2013 07:33:13 PAGE 3   
+
+ 118          
+ 119          void initTimer(){
+ 120   1        TMOD=0x91; // as 16bit-counter.
+ 121   1        //close all T1,T0
+ 122   1        TR0=0;
+ 123   1        TR1=0;
+ 124   1      }
+ 125          void initExternelInt(){
+ 126   1        IT0=1;    //1: is negative edged triggered.  
+ 127   1        IT1=1;    //1: is negative edged triggered.  
+ 128   1      }
+ 129          
+ 130          void initInterrupt(){
+ 131   1        initTimer();
+ 132   1        initExternelInt();
+ 133   1        //enable timer T1,T0
+ 134   1        ET0=1;
+ 135   1        ET1=1;
+ 136   1        //disable externel interrupt INT1,INT0
+ 137   1        EX0=0;
+ 138   1        EX1=0;
+ 139   1        //disable serial INT
+ 140   1        ES=0;
+ 141   1        //enable all interrupt.
+ 142   1        EA=1;
+ 143   1      
+ 144   1      }
+ 145          void init(){
+ 146   1        initInterrupt();
+ 147   1        initUltrasonic();
+ 148   1      }
+ 149          timer0() interrupt 1  
+ 150          {  /****for the leds scan dispaly****/
+ 151   1        TH0=0xff-0x03; 
+ 152   1        TL0=0xff-0x00;    
+ 153   1        refreshLeds();
+ 154   1      }
+ 155          
+ 156          
+ 157          /*externlInt0()   interrupt 0
+ 158            {
+ 159            }*/
+ 160          
+ 161          /**********************Ultrasonic***************/
+ 162          TimeType timeAfterUltrasonic=0; //****for count the time used by ultrasonic************
+ 163          void initUltrasonic(){
+ 164   1        P10=0;
+ 165   1      }
+ 166          void trigerUltrasonic(){
+ 167   1        //had better be reinvoked after    60ms
+ 168   1        //keep a 10us, high level 
+ 169   1        uchar i;
+ 170   1        TH1=0;
+ 171   1        TL1=0;
+ 172   1        TR1=1;
+ 173   1        timeAfterUltrasonic=0;
+ 174   1        /****start trigger****/
+ 175   1        P10=1;//keep high level for 10us.
+ 176   1        for(i=0;i<5;i++);
+ 177   1        P10=0;
+ 178   1        /****end trigger******/
+ 179   1      
+C51 COMPILER V9.01   ABC                                                                   08/15/2013 07:33:13 PAGE 4   
+
+ 180   1        /***start receive***/
+ 181   1        EX1=1;
+ 182   1      }
+ 183          /**********************end Ultrasonic***************/
+ 184          
+ 185          
+ 186          /*******************filter and show in Leds,from data:timeAfterUltrasonic********/
+ 187          #define Buffer_len 8
+ 188          TimeType timeBuffer[Buffer_len];
+ 189          uchar pBuffer=0;
+ 190          
+ 191          /*  
+ 192          #define realTimeBuffer_len 3
+ 193          TimeType realTimeBuffer[realTimeBuffer_len];
+ 194          uchar pRealTimeBuffer=0;
+ 195          
+ 196          #define realTime_Delta_Max 30*/ 
+ 197          
+ 198          uchar ignoreDeltaCount=3;
+ 199          
+ 200          long abs(long a){if(a<0)return -a;return a;}
+ 201          long abs2(long a,long b){if(a>b)return a-b;return b-a;}
+ 202          char sign(long a){if(a>0)return 1;if(a<0)return -1;return 0;}
+ 203          
+ 204          ulong sum(ulong *arr,uchar size){
+ 205   1        uchar i,temp=0;
+ 206   1        for(i=0;i<size;i++)temp+=arr[i];
+ 207   1        return temp;
+ 208   1      }
+ 209          
+ 210          void filterAndShow(){
+ 211   1        TimeType realTime=0;
+ 212   1        /*****start calulate the realTime******/
+ 213   1        quicksort(timeBuffer,Buffer_len);
+ 214   1        /**
+ 215   1          a very interesting bug!!!
+ 216   1          quicksort(timeBuffer,Buffer_len); when i delete this instruction,compiler outputs:*** ERROR L107: ADDRE
+             -SS SPACE OVERFLOW
+ 217   1          I really can't understand what happened?!
+ 218   1      
+ 219   1      */
+ 220   1        realTime=timeBuffer[Buffer_len*5/10]       ;
+ 221   1        /*****end calulate the realTime******/
+ 222   1      
+ 223   1        /****limit the delta*******/
+ 224   1        if(ignoreDeltaCount==0){
+ 225   2          /*long oldRealTime=realTimeBuffer[pRealTimeBuffer];
+ 226   2            long delta=realTime-oldRealTime;
+ 227   2            if(abs(delta)>realTime_Delta_Max){
+ 228   2            realTime=oldRealTime+sign(delta)*realTime_Delta_Max;
+ 229   2            } */
+ 230   2        }else{
+ 231   2          ignoreDeltaCount--;
+ 232   2        }
+ 233   1        /****end limit the delta*******/ 
+ 234   1      
+ 235   1        /*  pRealTimeBuffer++;
+ 236   1          pRealTimeBuffer%=realTimeBuffer_len;
+ 237   1          realTimeBuffer[pRealTimeBuffer]=realTime;     */
+ 238   1        /**************/
+ 239   1        //showNumInLeds(realTime/10);
+ 240   1      
+C51 COMPILER V9.01   ABC                                                                   08/15/2013 07:33:13 PAGE 5   
+
+ 241   1        /*
+ 242   1           realTime is us.
+ 243   1           t=realTime*10^-6s
+ 244   1           L=t*(340/2)m/s=t*170=realTime*17*10^-5m
+ 245   1           Lcm=L*10^2cm/m=realTime*17*10^-3cm.
+ 246   1           Lmm=L*10^3mm/m=realTime*17*10^-2mm.
+ 247   1           Lum=L*10^6um/m=realTime*17*10^1um;
+ 248   1           */
+ 249   1        realTime*=17;
+ 250   1        realTime*=10;
+ 251   1        showNumInLeds(realTime);  
+ 252   1      }
+ 253          
+ 254          void saveToBuffer(){
+ 255   1        pBuffer++;
+ 256   1        pBuffer%=Buffer_len;
+ 257   1        timeBuffer[pBuffer]=timeAfterUltrasonic;
+ 258   1        if(pBuffer==0){
+ 259   2          filterAndShow();
+ 260   2        }  
+ 261   1      }
+ 262          /*******************end filter and show in Leds,from data:timeAfterUltrasonic********/
+ 263          
+ 264          
+ 265          /******************counting and gathering data from ultrasonic,save data to :timeAfterUltrasonic**********
+             -****/
+ 266          timer1() interrupt 3  
+ 267          {
+ 268   1        timeAfterUltrasonic+=0x10000;
+ 269   1        //continue count the time....
+ 270   1        TH1=0;
+ 271   1        TL1=0;
+ 272   1      }
+ 273          uchar isGatheringData=0; 
+ 274          externlInt1()   interrupt 2
+ 275          {
+ 276   1        ulong temp;
+ 277   1        if(!isGatheringData){
+ 278   2          isGatheringData=1;
+ 279   2          /****stop timer1,and externel INT!****/
+ 280   2          TR1=0;
+ 281   2          EX1=0;
+ 282   2          /******save the time used to timeAfterUltrasonic****/
+ 283   2          temp=TH1;
+ 284   2          temp<<=8;
+ 285   2          temp|=TL1;
+ 286   2          timeAfterUltrasonic+=temp;
+ 287   2          saveToBuffer();
+ 288   2          isGatheringData=0;
+ 289   2        }
+ 290   1      } 
+ 291          /******************end counting and gathering data from ultrasonic**************/
+ 292          
+ 293          
+ 294          void myDelay(int round){
+ 295   1        while(round--){
+ 296   2          int i=0;
+ 297   2          for(i=0;i<1000;i++);}
+ 298   1      }
+ 299          
+ 300          void main(void)   // 主程序
+ 301          { 
+C51 COMPILER V9.01   ABC                                                                   08/15/2013 07:33:13 PAGE 6   
+
+ 302   1        //ulong showLedNum=12345678;
+ 303   1        //    init();
+ 304   1      //  LED_DATA=0x03;
+ 305   1      //  LED_DATA=~SEG7[4];
+ 306   1      //  LED_SELECT=5;
+ 307   1      //  while(1);
+ 308   1      
+ 309   1        showNumInLeds(123);
+ 310   1        while(1){
+ 311   2          refreshLeds();
+ 312   2        }
+ 313   1        //start T0,stop T1.
+ 314   1        TR0=1;
+ 315   1        TR1=0;
+ 316   1        while(1){
+ 317   2          if(!isGatheringData){
+ 318   3            trigerUltrasonic();
+ 319   3          }
+ 320   2          //showNumInLeds(showLedNum--);
+ 321   2          myDelay(2);
+ 322   2        }
+ 323   1      
+ 324   1        while(1);
+ 325   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =   1326    ----
+   CONSTANT SIZE    =     10    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =     56      61
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

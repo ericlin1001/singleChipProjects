@@ -1,0 +1,8 @@
+"STARTUP.obj",
+"ultrasonic.obj",
+"d7led.obj",
+"header.obj",
+"algorithm.obj",
+"main.obj" 
+TO "ultrasonic" 
+RAMSIZE(256) 

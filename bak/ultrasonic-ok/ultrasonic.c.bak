@@ -1,0 +1,325 @@
+//ultransonic-byEric.cpp
+//曾吉申～ 可以直接复制这里的。。。
+/***
+TMOD:
+T1                T0
+GATE C/~T M1 M0 | GATE C/~T M1 M0 | 
+
+M1M0: 
+00  13bit-counter,N=13
+01	 16bit-counter,N=16
+10	 2 8bit-counter,auto initialized with initial value,N=8
+11	 2 8bit-counter,only for T0,N=8
+
+
+C/~T:
+0: counter the machine period,used for timer.
+1: counter the pulse in T0,T1 pin. negative pulse is valid.
+
+
+GATE:
+0: only controlled by TR0/TR1
+1: controlled by both of TR0/TR1 and INT0/INT1
+*/
+/*
+IP:interrup priority
+IP bit: 4	3	 2	 1	 0
+PS	PT1	 PX1 PT0 PT0
+1:is high priority, 0 is lower priority.
+
+TCON: timer,externel interrup control register.
+7~0
+7    6    5    4    3   2  1   0
+TF1	 TR1  TF0 TR0 IE1 IT1 IE0 IT0
+TF1:timer1 overflow request.
+IE1:interrupt externel 1 request.
+IT1:~INT1 control bit. 1: is edged triggered. 0:TLL level triggered.
+
+IE:interrupt enable.
+7~0
+7  4  3   2   1   0
+EA ES ET1 EX1 ET0 EX0	
+EA: enable all interrup. 1 allows all interrup.
+ES:serial int enable	
+ET1:timer1 enable
+EX1:externel enable.
+*/
+#include <reg52.h>  
+sbit P10=P1^0;
+sbit P11=P1^1;
+
+#define uchar unsigned char //稓义一下窚便使用
+#define uint  unsigned int
+#define ulong unsigned long
+//***********************************************
+sfr  CLK_DIV = 0x97; //为STC单片机稓义,系统时钟分频
+typedef ulong TimeType;
+
+/****************algorithm***********************/
+typedef TimeType QuickSortType; 
+void swap(QuickSortType *a,int i,int j){*(a+i)^=*(a+j)^=*(a+i)^=*(a+j);}
+void quicksort(QuickSortType *array, int n);
+void quicksort(QuickSortType *array, int n)
+{
+	if(n>1){
+		int pivot=0,j;
+		for(j=1;j<n;j++)
+			if(array[j]<array[0])
+				swap(array,++pivot,j);
+		swap(array,0,pivot);
+		quicksort(array,pivot);
+		quicksort(array+pivot+1,n-pivot-1);
+	}
+}
+void copyArr(QuickSortType *from,QuickSortType *to,int n){
+	while(n--)*to++=*from++;
+}
+/****************end algorithm***********************/
+
+
+/**********************Leds control******************/
+#define Num_LEDs 8
+#define LED_DATA  P0
+#define LED_SELECT 	P1
+uchar ledOutputBuffer[Num_LEDs];// the data have been translated.
+uchar ledIndex[8]={0,1,2,3,4,5,6,7} ;//this control which leds to be used.
+uchar pLed=0;//just a pointer,used by refreshLeds.
+uchar code SEG7[10]={0xC0,0xF9,0xA4,0xB0,0x99,0x92,0x82,0xF8,0x80,0x90};//7seg-leds translating table 0-9
+//*************
+void initLeds();
+void showNumInLeds(ulong num);
+void refreshLeds();
+//*************
+void showNumInLeds(ulong num){
+	uchar i=0;
+	for(i=0;i<Num_LEDs;i++){
+		ledOutputBuffer[i]=SEG7[num%10];
+		num/=10;
+		if(num==0)break;
+	}
+	//turn off Zero's leds.
+	for(i++;i<Num_LEDs;i++) ledOutputBuffer[i]=0xff;
+}
+void refreshLeds(){
+	/*  recommended timer dealy setting:
+	    TH0=0xff-0x07;
+	    TL0=0xff-0x00;	 
+	    */
+	LED_SELECT=ledIndex[7-pLed];
+	LED_DATA=~ledOutputBuffer[pLed];	   
+	//
+	pLed++;
+	if(pLed>=Num_LEDs)pLed-=Num_LEDs;
+}
+/**********************end Leds control******************/
+
+
+void initUltrasonic();
+
+void initTimer(){
+	TMOD=0x91; // as 16bit-counter.
+	//close all T1,T0
+	TR0=0;
+	TR1=0;
+}
+void initExternelInt(){
+	IT0=1;    //1: is negative edged triggered.  
+	IT1=1;    //1: is negative edged triggered.  
+}
+
+void initInterrupt(){
+	initTimer();
+	initExternelInt();
+	//enable timer T1,T0
+	ET0=1;
+	ET1=1;
+	//disable externel interrupt INT1,INT0
+	EX0=0;
+	EX1=0;
+	//disable serial INT
+	ES=0;
+	//enable all interrupt.
+	EA=1;
+
+}
+void init(){
+	initInterrupt();
+	initUltrasonic();
+}
+timer0() interrupt 1  
+{  /****for the leds scan dispaly****/
+	TH0=0xff-0x03; 
+	TL0=0xff-0x00;	 	
+	refreshLeds();
+}
+
+
+/*externlInt0()   interrupt 0
+  {
+  }*/
+
+/**********************Ultrasonic***************/
+TimeType timeAfterUltrasonic=0;	//****for count the time used by ultrasonic************
+void initUltrasonic(){
+	P10=0;
+}
+void trigerUltrasonic(){
+	//had better be reinvoked after 	 60ms
+	//keep a 10us, high level 
+	uchar i;
+	TH1=0;
+	TL1=0;
+	TR1=1;
+	timeAfterUltrasonic=0;
+	/****start trigger****/
+	P10=1;//keep high level for 10us.
+	for(i=0;i<5;i++);
+	P10=0;
+	/****end trigger******/
+
+	/***start receive***/
+	EX1=1;
+}
+/**********************end Ultrasonic***************/
+
+
+/*******************filter and show in Leds,from data:timeAfterUltrasonic********/
+#define Buffer_len 8
+TimeType timeBuffer[Buffer_len];
+uchar pBuffer=0;
+
+/*	
+#define realTimeBuffer_len 3
+TimeType realTimeBuffer[realTimeBuffer_len];
+uchar pRealTimeBuffer=0;
+
+#define realTime_Delta_Max 30*/	
+
+uchar ignoreDeltaCount=3;
+
+long abs(long a){if(a<0)return -a;return a;}
+long abs2(long a,long b){if(a>b)return a-b;return b-a;}
+char sign(long a){if(a>0)return 1;if(a<0)return -1;return 0;}
+
+ulong sum(ulong *arr,uchar size){
+	uchar i,temp=0;
+	for(i=0;i<size;i++)temp+=arr[i];
+	return temp;
+}
+
+void filterAndShow(){
+	TimeType realTime=0;
+	/*****start calulate the realTime******/
+	quicksort(timeBuffer,Buffer_len);
+	/**
+	  a very interesting bug!!!
+	  quicksort(timeBuffer,Buffer_len); when i delete this instruction,compiler outputs:*** ERROR L107: ADDRESS SPACE OVERFLOW
+	  I really can't understand what happened?!
+
+*/
+	realTime=timeBuffer[Buffer_len*5/10]		   ;
+	/*****end calulate the realTime******/
+
+	/****limit the delta*******/
+	if(ignoreDeltaCount==0){
+		/*long oldRealTime=realTimeBuffer[pRealTimeBuffer];
+		  long delta=realTime-oldRealTime;
+		  if(abs(delta)>realTime_Delta_Max){
+		  realTime=oldRealTime+sign(delta)*realTime_Delta_Max;
+		  } */
+	}else{
+		ignoreDeltaCount--;
+	}
+	/****end limit the delta*******/ 
+
+	/*	pRealTimeBuffer++;
+		pRealTimeBuffer%=realTimeBuffer_len;
+		realTimeBuffer[pRealTimeBuffer]=realTime;	  	*/
+	/**************/
+	//showNumInLeds(realTime/10);
+
+	/*
+	   realTime is us.
+	   t=realTime*10^-6s
+	   L=t*(340/2)m/s=t*170=realTime*17*10^-5m
+	   Lcm=L*10^2cm/m=realTime*17*10^-3cm.
+	   Lmm=L*10^3mm/m=realTime*17*10^-2mm.
+	   Lum=L*10^6um/m=realTime*17*10^1um;
+	   */
+	realTime*=17;
+	realTime*=10;
+	showNumInLeds(realTime);  
+}
+
+void saveToBuffer(){
+	pBuffer++;
+	pBuffer%=Buffer_len;
+	timeBuffer[pBuffer]=timeAfterUltrasonic;
+	if(pBuffer==0){
+		filterAndShow();
+	}	 
+}
+/*******************end filter and show in Leds,from data:timeAfterUltrasonic********/
+
+
+/******************counting and gathering data from ultrasonic,save data to :timeAfterUltrasonic**************/
+timer1() interrupt 3  
+{
+	timeAfterUltrasonic+=0x10000;
+	//continue count the time....
+	TH1=0;
+	TL1=0;
+}
+uchar isGatheringData=0; 
+externlInt1()   interrupt 2
+{
+	ulong temp;
+	if(!isGatheringData){
+		isGatheringData=1;
+		/****stop timer1,and externel INT!****/
+		TR1=0;
+		EX1=0;
+		/******save the time used to timeAfterUltrasonic****/
+		temp=TH1;
+		temp<<=8;
+		temp|=TL1;
+		timeAfterUltrasonic+=temp;
+		saveToBuffer();
+		isGatheringData=0;
+	}
+} 
+/******************end counting and gathering data from ultrasonic**************/
+
+
+void myDelay(int round){
+	while(round--){
+		int i=0;
+		for(i=0;i<1000;i++);}
+}
+
+void main(void)   // 主程序
+{ 
+	//ulong showLedNum=12345678;
+	//  	init();
+//	LED_DATA=0x03;
+//	LED_DATA=~SEG7[4];
+//	LED_SELECT=5;
+//	while(1);
+
+	showNumInLeds(123);
+	while(1){
+		refreshLeds();
+	}
+	//start T0,stop T1.
+	TR0=1;
+	TR1=0;
+	while(1){
+		if(!isGatheringData){
+			trigerUltrasonic();
+		}
+		//showNumInLeds(showLedNum--);
+		myDelay(2);
+	}
+
+	while(1);
+}

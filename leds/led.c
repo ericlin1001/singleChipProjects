@@ -1,0 +1,102 @@
+#include "header.h"
+
+void delayms(u16 ms){
+	uchar j=0;
+	while(ms--){j=130;while(j--);}
+}
+void delay(u16 ms){
+	delayms(ms);
+}
+
+
+void delays(u16 s){
+	while(s--)delayms(1000);
+}
+
+#define LED_Port P2
+void LED_show(u8 num){
+	LED_Port=num;
+}
+int num;
+sbit P2_0= P2^0;
+void int_1()interrupt 3
+{
+
+	unsigned char n;
+
+	TH1= 0x3c;
+	TL1= 0xb0;					 //3cb0是15535，则计时为（65535-15535=50000）us，即50ms
+	TR1= 1;
+	n++;
+	if(n==10)					 //0.5s  num加1
+	{
+		num=~num;
+		n= 0;
+	}
+
+}
+
+
+tmain()
+{ 
+	TMOD= 0X10;						//定时器1的工作方式1
+	EA= 1;							//开启总中断
+	ET1= 1;							//开启定时器中断1
+	TH1= 0x3c;						//高位赋初值
+	TL1= 0xb0;						//低位赋初值	 3cb0是15535，则计时为（65535-15535=50000）us，即50ms
+	TR1= 1;							//启动定时器	T1
+	num= 0;
+	while(1)
+	{
+		P2_0= num;
+	}
+}
+void LED_test4(){
+	char LED;
+	unsigned char i;
+
+	while (1) 
+	{	 LED = 0xfe;
+
+		for (i = 0 ;i < 8 ; i++)
+		{ 
+			P2  = LED;
+			delay(500);
+			LED = LED << 1;	     // 左移
+			LED = LED | 0x01;	 // 移位后，后面的位为高电平
+			if (LED == 0x7f)	 break;	  //提前退出 FOR 循环
+		}
+
+		for (i = 0 ;i < 8 ; i++)
+		{
+
+			P2  = LED;
+			delay(500);
+			LED = LED >> 1;	 // 右移
+			LED = LED | 0x80;	 // 移位后，后面的位为高电平
+
+		}
+
+	}
+}
+void LED_test(){
+	u8 num=0x03;
+	while(1){
+		LED_show(num);
+		delays(1);
+		num=_cror_(num,1);
+		/*	if(num&0x01){
+			num>>=1;
+			num|=0x80;
+			}else{
+			num>>=1;
+			}  */
+	}
+}
+int led_main(void){
+	LED_test4();
+	tmain();
+	LED_test();
+	LED_test();
+	return 0;
+}

@@ -1,0 +1,79 @@
+#include "flash.h"
+
+/**********************flash******************/
+u8   FLASH_curPage;
+u32  FLASH_buffer[256];
+bool FLASH_isChange[256];
+bool FLASH_isChangeFlag=FALSE;
+//
+
+void FLASH_init(){
+	u16 i;
+	FLASH_Unlock();
+	FLASH_WaitForLastOperation(1000);
+	FLASH_ClearFlag(FLASH_FLAG_BSY | FLASH_FLAG_EOP | FLASH_FLAG_PGERR | FLASH_FLAG_WRPRTERR);	  
+	FLASH_WaitForLastOperation(1000);
+	for(i=0;i<=255;i++){
+		FLASH_isChange[i]=FALSE;
+	}
+	FLASH_isChangeFlag=FALSE;
+	FLASH_curPage=1;
+	FLASH_selectPage(0);//this make it load the flash to buffer.
+	
+}	
+void FLASH_selectPage(u8 page){
+	u32 i;
+	u32 baseAddr;
+	//
+	if(FLASH_curPage==page)return;
+	if(FLASH_isChangeFlag==TRUE){
+		//write old buffer to page.
+		FLASH_flush();
+	}
+	//switch to new page.
+	FLASH_curPage=page;
+	//load new flash page into buffer.
+	 baseAddr=FLASH_START_ADDR+(u32)FLASH_curPage*1024;
+	for(i=0;i<=255;i++){
+		u32 addr=baseAddr+(u32)i*4;
+		FLASH_buffer[i]=(*(vu32*)addr);
+		FLASH_WaitForLastOperation(1000);
+	}
+	//
+}
+void FLASH_set(u8 index,u32 data){
+	if(data!=FLASH_buffer[index]){
+		FLASH_isChangeFlag=TRUE;
+		FLASH_isChange[index]=TRUE;
+		FLASH_buffer[index]=data;
+	}
+}
+u32  FLASH_get(u8 index){
+	return FLASH_buffer[index];
+}
+
+void FLASH_flush(){
+	u32 i;
+	u32 baseAddr=FLASH_START_ADDR+(u32)FLASH_curPage*1024;
+	u32 addr;
+	if(FLASH_isChangeFlag==TRUE){
+		//write buffer into flash.
+		FLASH_ClearFlag(FLASH_FLAG_BSY | FLASH_FLAG_EOP | FLASH_FLAG_PGERR | FLASH_FLAG_WRPRTERR);
+		FLASH_WaitForLastOperation(1000);
+		FLASH_ErasePage(baseAddr);
+		FLASH_WaitForLastOperation(1000);
+		for(i=0;i<=255;i++){
+			if(FLASH_isChange[i]==TRUE){
+				 addr=baseAddr+(u32)i*4;
+				FLASH_WaitForLastOperation(1000);
+				FLASH_ProgramWord(addr,FLASH_buffer[i]);
+				FLASH_isChange[i]=FALSE;
+			}
+		}
+			FLASH_WaitForLastOperation(1000);
+		FLASH_isChangeFlag=FALSE;
+	}
+}
+u32 FLASH_autoGet(u32 index);//no need to change page.
+void FLASH_autoSet(u32 index,u32 data);//no need to change page.
+/**********************end flash**************/

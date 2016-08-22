@@ -1,0 +1,16 @@
+#include "header.h"
+#include "d7led.h"
+#include "algorithm.h"
+
+void d7led_main();
+void d7led_main(){
+	D7LED_show(2345678);
+	while(1)
+	{
+		D7LED_refresh();
+		delayms(1);
+	}
+}
+void main(void){
+	d7led_main();
+}

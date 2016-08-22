@@ -1,0 +1,501 @@
+C51 COMPILER V9.01   MAIN                                                                  09/02/2013 22:18:46 PAGE 1   
+
+
+C51 COMPILER V9.01, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN main.OBJ
+COMPILER INVOKED BY: J:\Keil\C51\BIN\C51.EXE main.c BROWSE DEBUG OBJECTEXTEND TABS(2)
+
+line level    source
+
+   1          #include<stdlib.h>
+   2          #include "header.h"
+   3          
+   4          #include "algorithm.h"
+   5          #include "ultrasonic.h"
+   6          
+   7          
+   8          
+   9          #define LIMIT(x,min,max) if(x>max)x=max;else if(x<min)x=min;
+  10          
+  11          /*
+  12          TimeType timeBuffer0[Buffer_len];
+  13          uchar pBuffer0=0;//point to the current data.
+  14          
+  15          TimeType timeBuffer1[Buffer_len];
+  16          uchar pBuffer1=0;//point to the current data.
+  17          */
+  18          /*
+  19            len(mm)*100/17=time(us)
+  20          */
+  21          void tt();
+  22          
+  23          volatile TimeType t0=0xffff,t1=0xffff;
+  24          
+  25          /**************
+  26            program restriction:
+  27            detect distance:2cm~11m
+  28           ***/
+  29          
+  30          static uchar isWaitForData0=0;
+  31          static uchar countForResend0=0;
+  32          static uchar isReceivingData0=0; 
+  33          
+  34          static uchar isWaitForData1=0;
+  35          static uchar countForResend1=0;
+  36          static uchar isReceivingData1=0; 
+  37          
+  38          void ultrasonicOk0(TimeType durTime);
+  39          void ultrasonicOk1(TimeType durTime);
+  40          
+  41          static void init(){
+  42   1        ENABLE_ALL_INT;
+  43   1      
+  44   1        ENABLE_TIMER1;
+  45   1        //TIMER1_INIT(TIMER_GATE(1)|TIMER_TC(0)|TIMER_MODE(1));
+  46   1        TIMER1_STOP;
+  47   1      
+  48   1        ENABLE_TIMER0;
+  49   1        //TIMER0_INIT(TIMER_GATE(1)|TIMER_TC(0)|TIMER_MODE(1));
+  50   1        TMOD=(TIMER_GATE(1)|TIMER_TC(0)|TIMER_MODE(1))|(TIMER_GATE(1)|TIMER_TC(0)|TIMER_MODE(1))<<4;
+  51   1        TIMER0_STOP;
+  52   1        //
+  53   1        DISABLE_EXTINT1;
+  54   1        DISABLE_EXTINT0;
+  55   1        EXTINT1_MODE_TRIG(1);//negative edge trigger.
+C51 COMPILER V9.01   MAIN                                                                  09/02/2013 22:18:46 PAGE 2   
+
+  56   1        EXTINT0_MODE_TRIG(1);
+  57   1      }
+  58          
+  59          
+  60          timer1() interrupt 3  
+  61          {
+  62   1        //Error!!!!
+  63   1        isWaitForData1=0;
+  64   1        TIMER1_STOP;
+  65   1        DISABLE_EXTINT1;
+  66   1        if(t1<3000)t1+=200;
+  67   1        tt();
+  68   1      }
+  69          
+  70          timer0() interrupt 1
+  71          {
+  72   1        //Error!!!!
+  73   1        isWaitForData0=0;
+  74   1        TIMER0_STOP;
+  75   1        DISABLE_EXTINT0;
+  76   1        if(t0<3000)t0+=200;
+  77   1        tt();
+  78   1      }
+  79          
+  80          void ultrasonicInit(){
+  81   1        ULTRA1_TRIG_PIN=0;
+  82   1        ULTRA0_TRIG_PIN=0;
+  83   1      }
+  84          
+  85          void ultrasonicTrigger0(){
+  86   1        //had better be reinvoked after    60ms
+  87   1        //keep a 10us, high level 
+  88   1        //using timer1 to count the time.
+  89   1        uchar i;
+  90   1        #define MAX_COUNTFORRESEND 10
+  91   1        if(isWaitForData0){
+  92   2          //it means ,the last time data haven't recevied!.
+  93   2          countForResend0++;
+  94   2          if(countForResend0>=MAX_COUNTFORRESEND){
+  95   3            countForResend0=0;
+  96   3            isWaitForData0=0;
+  97   3          }
+  98   2        }else{
+  99   2          //normally trigger the ultrasonic.
+ 100   2          isWaitForData0=1;
+ 101   2        
+ 102   2          TIMER0_SET(65536);
+ 103   2          TIMER0_START;//however,it only count for 
+ 104   2      
+ 105   2          
+ 106   2          /****start trigger****/
+ 107   2          ULTRA0_TRIG_PIN=1;//keep high level for 10us.
+ 108   2          for(i=0;i<5;i++);
+ 109   2          ULTRA0_TRIG_PIN=0;
+ 110   2      
+ 111   2          /****end trigger******/
+ 112   2      
+ 113   2          /***start receive***/
+ 114   2          ENABLE_EXTINT0;
+ 115   2        }
+ 116   1        P1_6=~P1_6;
+ 117   1      }
+C51 COMPILER V9.01   MAIN                                                                  09/02/2013 22:18:46 PAGE 3   
+
+ 118          uchar p37=0;
+ 119          ulong testcount=0;
+ 120          
+ 121          void ultrasonicTrigger1(){
+ 122   1        //had better be reinvoked after    60ms
+ 123   1        //keep a 10us, high level 
+ 124   1        //using timer1 to count the time.
+ 125   1        uchar i;
+ 126   1        if(isWaitForData1){
+ 127   2          //it means ,the last time data haven't recevied!.
+ 128   2          countForResend1++;
+ 129   2          if(countForResend1>=MAX_COUNTFORRESEND){
+ 130   3            countForResend1=0;
+ 131   3            isWaitForData1=0;
+ 132   3          }
+ 133   2        }else{
+ 134   2          //normally trigger the ultrasonic.
+ 135   2          isWaitForData1=1;
+ 136   2        
+ 137   2          TIMER1_SET(65536);
+ 138   2          TIMER1_START;//however,it only count for 
+ 139   2        
+ 140   2          
+ 141   2          ULTRA1_TRIG_PIN=1;//keep high level for 10us.
+ 142   2          for(i=0;i<5;i++);
+ 143   2          ULTRA1_TRIG_PIN=0;
+ 144   2      
+ 145   2        
+ 146   2          ENABLE_EXTINT1;
+ 147   2        
+ 148   2          
+ 149   2        }
+ 150   1        P1_7=~P1_7;
+ 151   1      }
+ 152          
+ 153          
+ 154          void ultrasonicReceive0(){
+ 155   1        u16 temp=0;
+ 156   1        if(!isReceivingData0 && isWaitForData0){//to avoid reenter this function!.
+ 157   2          isReceivingData0=1;
+ 158   2          /******save the time used to timeAfterUltrasonic****/
+ 159   2          temp=TH0;
+ 160   2          temp<<=8;
+ 161   2          temp|=TL0;
+ 162   2          if(temp<10){
+ 163   3            isReceivingData0=0;
+ 164   3            return;
+ 165   3          }
+ 166   2          /****stop timer1,and externel INT!****/
+ 167   2          TIMER0_STOP;
+ 168   2          DISABLE_EXTINT0;
+ 169   2          ultrasonicOk0(temp*17/100);
+ 170   2          isReceivingData0=0;
+ 171   2          isWaitForData0=0;
+ 172   2        }
+ 173   1      }
+ 174          
+ 175          void ultrasonicReceive1(){
+ 176   1        u16 temp=0;
+ 177   1        if(!isReceivingData1 && isWaitForData1){//to avoid reenter this function!.
+ 178   2          isReceivingData1=1;
+ 179   2          /******save the time used to timeAfterUltrasonic****/
+C51 COMPILER V9.01   MAIN                                                                  09/02/2013 22:18:46 PAGE 4   
+
+ 180   2          temp=TH1;
+ 181   2          temp<<=8;
+ 182   2          temp|=TL1;
+ 183   2          if(temp<10){
+ 184   3            isReceivingData1=0;
+ 185   3            return;
+ 186   3          }
+ 187   2          /****stop timer1,and externel INT!****/
+ 188   2          TIMER1_STOP;
+ 189   2          DISABLE_EXTINT1;
+ 190   2          ultrasonicOk1(temp*17/100);
+ 191   2          isReceivingData1=0;
+ 192   2          isWaitForData1=0;
+ 193   2        }
+ 194   1      }
+ 195          
+ 196          void initBuffer(){
+ 197   1        //take care of the init value.
+ 198   1        /*uchar i;
+ 199   1        for(i=0;i<Buffer_len;i++){
+ 200   1          timeBuffer1[i]=0;
+ 201   1          timeBuffer0[i]=0;
+ 202   1        }*/
+ 203   1      }
+ 204          
+ 205          externlInt0() interrupt 0
+ 206          {
+ 207   1        ultrasonicReceive0();
+ 208   1      } 
+ 209          
+ 210          externlInt1() interrupt 2
+ 211          {
+ 212   1        ultrasonicReceive1();
+ 213   1      } 
+ 214          
+ 215          
+ 216          void ultrasonicOk1(TimeType durTime){
+ 217   1      //t1=filterData(timeBuffer1,durTime,&pBuffer1);
+ 218   1        t1=durTime;
+ 219   1        tt();
+ 220   1      }
+ 221          void ultrasonicOk0(TimeType durTime){
+ 222   1      //t0=filterData(timeBuffer0,durTime,&pBuffer0);
+ 223   1        t0=durTime;
+ 224   1        
+ 225   1        tt();
+ 226   1      }
+ 227          //**************************
+ 228          
+ 229          ulong temp_time;
+ 230          #define doTime(m) temp_time=m;while(temp_time--)
+ 231          
+ 232          sbit leftWheelControl0=P1^1;
+ 233          sbit leftWheelControl1=P1^0;
+ 234          
+ 235          sbit rightWheelControl1=P1^2;
+ 236          sbit rightWheelControl0=P1^3;
+ 237          /*
+ 238          #define LeftWheel_Stop    {leftWheelControl0=0;leftWheelControl1=0;}
+ 239          #define LeftWheel_Forward   {leftWheelControl0=1;leftWheelControl1=0;}
+ 240          #define LeftWheel_Backward  {leftWheelControl0=0;leftWheelControl1=1;}
+ 241          
+C51 COMPILER V9.01   MAIN                                                                  09/02/2013 22:18:46 PAGE 5   
+
+ 242          #define RightWheel_Stop     {rightWheelControl0=0;rightWheelControl1=0;}
+ 243          #define RightWheel_Forward    {rightWheelControl0=1;rightWheelControl1=0;}
+ 244          #define RightWheel_Backward   {rightWheelControl0=0;rightWheelControl1=1;}
+ 245          */
+ 246          #define LeftWheel_Stop    doTime(50){leftWheelControl0=0;leftWheelControl1=0;}
+ 247          #define LeftWheel_Forward   doTime(50){leftWheelControl0=1;leftWheelControl1=0;}
+ 248          #define LeftWheel_Backward  doTime(50){leftWheelControl0=0;leftWheelControl1=1;}
+ 249          
+ 250          #define RightWheel_Stop     doTime(50){rightWheelControl0=0;rightWheelControl1=0;}
+ 251          #define RightWheel_Forward    doTime(50){rightWheelControl0=1;rightWheelControl1=0;}
+ 252          #define RightWheel_Backward   doTime(50){rightWheelControl0=0;rightWheelControl1=1;}
+ 253          
+ 254          
+ 255          
+ 256          
+ 257          #define LeftHighWidth  800
+ 258          #define LeftLowWidth  180
+ 259          //100 left >right
+ 260          
+ 261          #define RightHighWidth  100
+ 262          #define RightLowWidth 0
+ 263          
+ 264          //************************************
+ 265          
+ 266          
+ 267          ulong myRandLong(){
+ 268   1        ulong temp=0;
+ 269   1         temp=rand();
+ 270   1         temp*=rand();
+ 271   1         return temp;
+ 272   1      }
+ 273          
+ 274          
+ 275          u16 speed=1000;
+ 276          
+ 277          
+ 278          
+ 279          #define MODE_FORWARD 0
+ 280          #define MODE_LEFT 1
+ 281          #define MODE_B 1
+ 282          volatile uchar mode=0;
+ 283          volatile s16 vr,vl;
+ 284          volatile s16 vx=0,vy=-1000;
+ 285          volatile s16 fx=0,fy;
+ 286          volatile uchar isChange=1;
+ 287          
+ 288          
+ 289          
+ 290          
+ 291          void controlLeftWheel(s16 v){
+ 292   1        if(v>=0){
+ 293   2          if(rand()%1100<v){
+ 294   3            LeftWheel_Forward
+ 295   3          }else{
+ 296   3            LeftWheel_Stop
+ 297   3          } 
+ 298   2        }else{
+ 299   2          v=-v;
+ 300   2          if(rand()%1100<v){
+ 301   3            LeftWheel_Backward
+ 302   3          }else{
+ 303   3            LeftWheel_Stop
+C51 COMPILER V9.01   MAIN                                                                  09/02/2013 22:18:46 PAGE 6   
+
+ 304   3          } 
+ 305   2        }
+ 306   1      }     
+ 307          void controlRightWheel(s16 v){
+ 308   1        if(v>=0){
+ 309   2          if(rand()%1000<v){
+ 310   3            RightWheel_Forward
+ 311   3          }else{
+ 312   3            RightWheel_Stop
+ 313   3          } 
+ 314   2        }else{
+ 315   2          v=-v;
+ 316   2          if(rand()%1000<v){
+ 317   3            RightWheel_Backward
+ 318   3          }else{
+ 319   3            RightWheel_Stop
+ 320   3          } 
+ 321   2        }
+ 322   1      }
+ 323          /*
+ 324          void calForce(){
+ 325          fx=0;
+ 326          fy=100;
+ 327          if(t0>500 && t1>500){
+ 328          //safe area.
+ 329          }else{
+ 330            if(t0<100){
+ 331              fx+=500;
+ 332              fy+=-800;
+ 333            }
+ 334            if(t1<100){
+ 335              fx+=-500;
+ 336              fy+=-800;
+ 337            }
+ 338            if(t0>200&&t1>200){
+ 339              fx+=t1;
+ 340              fx=-t0;
+ 341              //
+ 342              fy-=(t1+t0)/10;
+ 343            }
+ 344          }
+ 345          }*/
+ 346          
+ 347          void calForce(){
+ 348   1        fx=0;
+ 349   1        fy=400;
+ 350   1        if(t1<300&&t0<300){
+ 351   2          fy-=800;
+ 352   2          fx+=t0;
+ 353   2          fx-=t1;
+ 354   2        }
+ 355   1        if(t1<200&&t0<200){
+ 356   2          fy-=1000;
+ 357   2          fx+=t0;
+ 358   2          fx-=t1; 
+ 359   2        }
+ 360   1      }
+ 361          
+ 362          uchar isTuring=0;
+ 363          uchar isBacking=0;
+ 364          
+ 365          uchar isLeft_back=0;
+C51 COMPILER V9.01   MAIN                                                                  09/02/2013 22:18:46 PAGE 7   
+
+ 366          void calVRL(){
+ 367   1      LIMIT(vx,-1000,1000);
+ 368   1        LIMIT(vy,-1000,1000);
+ 369   1        vl=vy+vx;
+ 370   1        vr=vy-vx;
+ 371   1        }
+ 372            
+ 373          void tt(){
+ 374   1      #define DIST 150
+ 375   1        vx=0;
+ 376   1        vy=0;
+ 377   1        if(t0<80||isBacking){
+ 378   2          isBacking=1;
+ 379   2          vx+=0;
+ 380   2          vy+=-((int)1200-t0*7);
+ 381   2          if(t0>200)isBacking=0;
+ 382   2        }else if(t0<230||isTuring){
+ 383   2          isTuring=1;
+ 384   2          if(t1>250){
+ 385   3            vx+=-((int)300+(230-t0)*3);
+ 386   3          }else{
+ 387   3            vx+=((int)300+(230-t0)*3);
+ 388   3          }
+ 389   2          vy+=t0-120;
+ 390   2          if(t0>400)isTuring=0;
+ 391   2        }else{
+ 392   2          //keep the distance.
+ 393   2          if(t1<70||isLeft_back){
+ 394   3            isLeft_back=1;
+ 395   3            vx+=300;
+ 396   3            vy+=t1/2;
+ 397   3            if(t1>DIST+20)isLeft_back=0;
+ 398   3          }else if(t1<DIST*3){
+ 399   3            vy+=500+(t1-80)*3;
+ 400   3            vx+=-(t1-DIST);
+ 401   3          }else{
+ 402   3            vy+=1000;
+ 403   3            vx+=0;
+ 404   3          }
+ 405   2        }
+ 406   1        calVRL();
+ 407   1      }
+ 408          
+ 409          
+ 410          void controlMotors(){
+ 411   1      controlLeftWheel(vl);
+ 412   1      controlRightWheel(vr);
+ 413   1      }
+ 414          void motorInitAction(){
+ 415   1      doTime(2){
+ 416   2      vx=0;
+ 417   2      vy=1000;
+ 418   2      //
+ 419   2      calVRL();
+ 420   2          controlLeftWheel(vl);
+ 421   2          controlRightWheel(vr);
+ 422   2          }
+ 423   1          doTime(10){
+ 424   2      vx=0;
+ 425   2      vy=-1000;
+ 426   2      //
+ 427   2      calVRL();
+C51 COMPILER V9.01   MAIN                                                                  09/02/2013 22:18:46 PAGE 8   
+
+ 428   2          controlLeftWheel(vl);
+ 429   2          controlRightWheel(vr);
+ 430   2        }
+ 431   1        
+ 432   1      }
+ 433          
+ 434          void test(){
+ 435   1      uchar i=9;
+ 436   1      while(1)
+ 437   1        //motorInitAction();
+ 438   1        while(1){
+ 439   2          if(++i%10==0){
+ 440   3            ultrasonicTrigger0();
+ 441   3            ultrasonicTrigger1();
+ 442   3            
+ 443   3          }
+ 444   2          controlLeftWheel(vl);
+ 445   2          controlRightWheel(vr);
+ 446   2      /*
+ 447   2          controlMotors();*/
+ 448   2        }
+ 449   1      }
+ 450          void main(void){
+ 451   1      uchar k=10;
+ 452   1      //0.5-2.5ms
+ 453   1        while(1){
+ 454   2          P2_0=1;
+ 455   2          P2_1=0;
+ 456   2        }
+ 457   1        while(1);
+ 458   1        init();
+ 459   1        
+ 460   1        //initBuffer();
+ 461   1        //delayms(1000);
+ 462   1        test();
+ 463   1        while(1);
+ 464   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =   1778    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =     38      10
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

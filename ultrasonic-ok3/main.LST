@@ -1,0 +1,402 @@
+C51 COMPILER V9.01   MAIN                                                                  09/13/2013 14:32:35 PAGE 1   
+
+
+C51 COMPILER V9.01, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN main.OBJ
+COMPILER INVOKED BY: J:\Keil\C51\BIN\C51.EXE main.c BROWSE DEBUG OBJECTEXTEND TABS(2)
+
+line level    source
+
+   1          #include<stdlib.h>
+   2          #include "header.h"
+   3          #include "key8.h"
+   4          #include "algorithm.h"
+   5          #include "ultrasonic.h"
+   6          #define LIMIT(x,min,max) if(x>max)x=max;else if(x<min)x=min;
+   7          /*
+   8          TimeType timeBuffer0[Buffer_len];
+   9          uchar pBuffer0=0;//point to the current data.
+  10          
+  11          TimeType timeBuffer1[Buffer_len];
+  12          uchar pBuffer1=0;//point to the current data.
+  13          */
+  14          /*
+  15            len(mm)*100/17=time(us)
+  16          */
+  17          void tt();
+  18          volatile TimeType t0=0xffff,t1=0xffff;
+  19          /**************
+  20            program restriction:
+  21            detect distance:2cm~11m
+  22           ***/
+  23          
+  24          static uchar isWaitForData0=0;
+  25          static uchar countForResend0=0;
+  26          static uchar isReceivingData0=0;
+  27          
+  28          static uchar isWaitForData1=0;
+  29          static uchar countForResend1=0;
+  30          static uchar isReceivingData1=0;
+  31          
+  32          void ultrasonicOk0(TimeType durTime);
+  33          void ultrasonicOk1(TimeType durTime);
+  34          
+  35          static void init(){
+  36   1        ENABLE_ALL_INT;
+  37   1      
+  38   1        ENABLE_TIMER1;
+  39   1        //TIMER1_INIT(TIMER_GATE(1)|TIMER_TC(0)|TIMER_MODE(1));
+  40   1        TIMER1_STOP;
+  41   1      
+  42   1        ENABLE_TIMER0;
+  43   1        //TIMER0_INIT(TIMER_GATE(1)|TIMER_TC(0)|TIMER_MODE(1));
+  44   1        TMOD=(TIMER_GATE(1)|TIMER_TC(0)|TIMER_MODE(1))|(TIMER_GATE(1)|TIMER_TC(0)|TIMER_MODE(1))<<4;
+  45   1        TIMER0_STOP;
+  46   1        //
+  47   1        DISABLE_EXTINT1;
+  48   1        DISABLE_EXTINT0;
+  49   1        EXTINT1_MODE_TRIG(1);//negative edge trigger.
+  50   1        EXTINT0_MODE_TRIG(1);
+  51   1      }
+  52          
+  53          
+  54          timer1() interrupt 3
+  55          {
+C51 COMPILER V9.01   MAIN                                                                  09/13/2013 14:32:35 PAGE 2   
+
+  56   1        //Error!!!!
+  57   1        isWaitForData1=0;
+  58   1        TIMER1_STOP;
+  59   1        DISABLE_EXTINT1;
+  60   1        if(t1<3000)t1+=200;
+  61   1        tt();
+  62   1      }
+  63          
+  64          timer0() interrupt 1
+  65          {
+  66   1        //Error!!!!
+  67   1        isWaitForData0=0;
+  68   1        TIMER0_STOP;
+  69   1        DISABLE_EXTINT0;
+  70   1        if(t0<3000)t0+=200;
+  71   1        tt();
+  72   1      }
+  73          
+  74          void ultrasonicInit(){
+  75   1        ULTRA1_TRIG_PIN=0;
+  76   1        ULTRA0_TRIG_PIN=0;
+  77   1      }
+  78          
+  79          void ultrasonicTrigger0(){
+  80   1        //had better be reinvoked after    60ms
+  81   1        //keep a 10us, high level
+  82   1        //using timer1 to count the time.
+  83   1        uchar i;
+  84   1        #define MAX_COUNTFORRESEND 10
+  85   1        if(isWaitForData0){
+  86   2          //it means ,the last time data haven't recevied!.
+  87   2          countForResend0++;
+  88   2          if(countForResend0>=MAX_COUNTFORRESEND){
+  89   3            countForResend0=0;
+  90   3            isWaitForData0=0;
+  91   3          }
+  92   2        }else{
+  93   2          //normally trigger the ultrasonic.
+  94   2          isWaitForData0=1;
+  95   2      
+  96   2          TIMER0_SET(65536);
+  97   2          TIMER0_START;//however,it only count for
+  98   2      
+  99   2      
+ 100   2          /****start trigger****/
+ 101   2          ULTRA0_TRIG_PIN=1;//keep high level for 10us.
+ 102   2          for(i=0;i<5;i++);
+ 103   2          ULTRA0_TRIG_PIN=0;
+ 104   2      
+ 105   2          /****end trigger******/
+ 106   2      
+ 107   2          /***start receive***/
+ 108   2          ENABLE_EXTINT0;
+ 109   2        }
+ 110   1      }
+ 111          
+ 112          void ultrasonicTrigger1(){
+ 113   1        //had better be reinvoked after    60ms
+ 114   1        //keep a 10us, high level
+ 115   1        //using timer1 to count the time.
+ 116   1        uchar i;
+ 117   1        if(isWaitForData1){
+C51 COMPILER V9.01   MAIN                                                                  09/13/2013 14:32:35 PAGE 3   
+
+ 118   2          //it means ,the last time data haven't recevied!.
+ 119   2          countForResend1++;
+ 120   2          if(countForResend1>=MAX_COUNTFORRESEND){
+ 121   3            countForResend1=0;
+ 122   3            isWaitForData1=0;
+ 123   3          }
+ 124   2        }else{
+ 125   2          //normally trigger the ultrasonic.
+ 126   2          isWaitForData1=1;
+ 127   2      
+ 128   2          TIMER1_SET(65536);
+ 129   2          TIMER1_START;//however,it only count for
+ 130   2      
+ 131   2      
+ 132   2          ULTRA1_TRIG_PIN=1;//keep high level for 10us.
+ 133   2          for(i=0;i<5;i++);
+ 134   2          ULTRA1_TRIG_PIN=0;
+ 135   2      
+ 136   2          ENABLE_EXTINT1;
+ 137   2      
+ 138   2      
+ 139   2        }
+ 140   1      }
+ 141          void ultrasonicReceive0(){
+ 142   1        u16 temp=0;
+ 143   1        if(!isReceivingData0 && isWaitForData0){//to avoid reenter this function!.
+ 144   2          isReceivingData0=1;
+ 145   2          /******save the time used to timeAfterUltrasonic****/
+ 146   2          temp=TH0;
+ 147   2          temp<<=8;
+ 148   2          temp|=TL0;
+ 149   2          if(temp<10){
+ 150   3            isReceivingData0=0;
+ 151   3            return;
+ 152   3          }
+ 153   2          /****stop timer1,and externel INT!****/
+ 154   2          TIMER0_STOP;
+ 155   2          DISABLE_EXTINT0;
+ 156   2          ultrasonicOk0(temp*17/100);
+ 157   2          isReceivingData0=0;
+ 158   2          isWaitForData0=0;
+ 159   2        }
+ 160   1      }
+ 161          
+ 162          void ultrasonicReceive1(){
+ 163   1        u16 temp=0;
+ 164   1        if(!isReceivingData1 && isWaitForData1){//to avoid reenter this function!.
+ 165   2          isReceivingData1=1;
+ 166   2          /******save the time used to timeAfterUltrasonic****/
+ 167   2          temp=TH1;
+ 168   2          temp<<=8;
+ 169   2          temp|=TL1;
+ 170   2          if(temp<10){
+ 171   3            isReceivingData1=0;
+ 172   3            return;
+ 173   3          }
+ 174   2          /****stop timer1,and externel INT!****/
+ 175   2          TIMER1_STOP;
+ 176   2          DISABLE_EXTINT1;
+ 177   2          ultrasonicOk1(temp*17/100);
+ 178   2          isReceivingData1=0;
+ 179   2          isWaitForData1=0;
+C51 COMPILER V9.01   MAIN                                                                  09/13/2013 14:32:35 PAGE 4   
+
+ 180   2        }
+ 181   1      }
+ 182          
+ 183          externlInt0() interrupt 0
+ 184          {
+ 185   1        ultrasonicReceive0();
+ 186   1      }
+ 187          
+ 188          externlInt1() interrupt 2
+ 189          {
+ 190   1        ultrasonicReceive1();
+ 191   1      }
+ 192          
+ 193          
+ 194          void ultrasonicOk1(TimeType durTime){
+ 195   1      //t1=filterData(timeBuffer1,durTime,&pBuffer1);
+ 196   1        t1=durTime;
+ 197   1        tt();
+ 198   1      }
+ 199          void ultrasonicOk0(TimeType durTime){
+ 200   1      //t0=filterData(timeBuffer0,durTime,&pBuffer0);
+ 201   1        t0=durTime;
+ 202   1        tt();
+ 203   1      }
+ 204          //**************************
+ 205          
+ 206          
+ 207          volatile s16 speed;
+ 208          volatile s16 angle=0;
+ 209          
+ 210          void mydelay(u16 us)   //误差 0us
+ 211          {
+ 212   1      unsigned char a,b;
+ 213   1      if(us<=0)return;
+ 214   1      while(us--){
+ 215   2          for(b=1;b>0;b--)
+ 216   2              for(a=2;a>0;a--);
+ 217   2          }
+ 218   1      }
+ 219          
+ 220          #define TURN_MOTOR P0_0
+ 221          void doAngle(s16 a){
+ 222   1        uchar i=5;
+ 223   1        a+=43;
+ 224   1        while(i--){
+ 225   2          TURN_MOTOR=1;
+ 226   2          mydelay(a);
+ 227   2          TURN_MOTOR=0;
+ 228   2          mydelay(1800-a);
+ 229   2        }
+ 230   1      }
+ 231          
+ 232          void testTurnMotor(){
+ 233   1        while(1){
+ 234   2          doAngle(-14);
+ 235   2          delayms(1000);
+ 236   2          doAngle(14);
+ 237   2          delayms(1000);
+ 238   2          doAngle(0);
+ 239   2          delayms(1000);
+ 240   2        }
+ 241   1      }
+C51 COMPILER V9.01   MAIN                                                                  09/13/2013 14:32:35 PAGE 5   
+
+ 242          
+ 243          #define MOTOR0 P1_2
+ 244          #define MOTOR1 P1_3
+ 245          
+ 246          #define MOTOR_FORWARD {MOTOR0=0;MOTOR1=1;}
+ 247          #define MOTOR_STOP {MOTOR0=0;MOTOR1=0;}
+ 248          #define MOTOR_BACKWARD {MOTOR0=1;MOTOR1=0;}
+ 249          
+ 250          void doMotor(s16 speed,u16 times){
+ 251   1        if(speed<0){
+ 252   2          speed=-speed;
+ 253   2          //speed=speed;
+ 254   2          while(times--){
+ 255   3          if(rand()%1000<speed){
+ 256   4          MOTOR_BACKWARD;
+ 257   4          }else{
+ 258   4            MOTOR_STOP;
+ 259   4          }
+ 260   3          }
+ 261   2        }else{
+ 262   2          //speed=speed/2+500;
+ 263   2          while(times--){
+ 264   3          if(rand()%1000<speed){
+ 265   4          MOTOR_FORWARD;
+ 266   4          }else{
+ 267   4            MOTOR_STOP;
+ 268   4          }
+ 269   3          }
+ 270   2        }
+ 271   1        
+ 272   1        
+ 273   1        
+ 274   1        
+ 275   1        
+ 276   1      }
+ 277          
+ 278          volatile uchar isTuring=0;
+ 279          volatile uchar isBacking=0;
+ 280          volatile uchar isLeft_back=0;
+ 281          //38508127
+ 282          
+ 283          
+ 284          void controller(){
+ 285   1        s16 newAngle=0;
+ 286   1        speed=1000;
+ 287   1        newAngle=0;
+ 288   1        if(t0<150||isBacking){
+ 289   2          //backing...
+ 290   2          isBacking=1;
+ 291   2          speed=-1000;
+ 292   2          if(t0>270)isBacking=0;
+ 293   2        }else if(t0<240||isTuring){
+ 294   2          isTuring=1;
+ 295   2          if(t1>500){
+ 296   3            //left turn
+ 297   3            newAngle=-14;
+ 298   3          }else{
+ 299   3            //right turn
+ 300   3            newAngle=14;
+ 301   3          }
+ 302   2          if(t0>400)isTuring=0;
+ 303   2        }else{
+C51 COMPILER V9.01   MAIN                                                                  09/13/2013 14:32:35 PAGE 6   
+
+ 304   2        #define DIST 200
+ 305   2          //keep the distance.
+ 306   2          if(t1<70||isLeft_back){
+ 307   3            //slightly right turn.
+ 308   3            isLeft_back=1;
+ 309   3            speed=1000;
+ 310   3            newAngle=4;
+ 311   3            if(t1>DIST+20)isLeft_back=0;
+ 312   3          }else if(t1<DIST*3){
+ 313   3            speed=1000;
+ 314   3            newAngle=-4;
+ 315   3          }else{
+ 316   3            speed=1000;
+ 317   3            newAngle=0;
+ 318   3          }
+ 319   2        }   
+ 320   1        if(newAngle!=angle){
+ 321   2          angle=newAngle;
+ 322   2          doAngle(angle);
+ 323   2        }
+ 324   1      }
+ 325            
+ 326          void error(){
+ 327   1      //not exit.
+ 328   1        EA=0;
+ 329   1        while(1){
+ 330   2          doMotor(0,500);
+ 331   2          doAngle(-14);
+ 332   2          doMotor(0,500);
+ 333   2          doAngle(14);
+ 334   2        }
+ 335   1        while(1);
+ 336   1      }
+ 337          
+ 338          void tt(){
+ 339   1        //controller();
+ 340   1        if(10<=t0 &&t0<200 &&10<=t1 && t1<200)error();
+ 341   1      }
+ 342          
+ 343          
+ 344          
+ 345          void main(void){
+ 346   1        s16 a=0;
+ 347   1        init();
+ 348   1        
+ 349   1        //error();
+ 350   1        speed=1000;
+ 351   1        doMotor(speed,100); 
+ 352   1        doAngle(-14);
+ 353   1        mydelay(500);
+ 354   1        doAngle(14);
+ 355   1        mydelay(500);
+ 356   1        doAngle(0);
+ 357   1        mydelay(500);
+ 358   1        while(1){
+ 359   2          P0_1=1;
+ 360   2          //controller();
+ 361   2          ultrasonicTrigger0();
+ 362   2          ultrasonicTrigger1();
+ 363   2          P0_1=0;
+ 364   2          doMotor(speed,100); 
+ 365   2        }
+C51 COMPILER V9.01   MAIN                                                                  09/13/2013 14:32:35 PAGE 7   
+
+ 366   1        while(1);
+ 367   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =   1145    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =     17       6
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

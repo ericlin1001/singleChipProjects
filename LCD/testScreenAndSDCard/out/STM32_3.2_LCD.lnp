@@ -1,0 +1,4 @@
+--device DARMSTM ".\out\stm32f10x.o" ".\out\main.o" ".\out\lcd.o" ".\STM32F10xR.LIB" ".\out\mmc.o" --strict --scatter ".\out\STM32_3.2_LCD.sct" 
+--autoat --summary_stderr --info summarysizes --map --xref --callgraph --symbols 
+--info sizes --info totals --info unused --info veneers 
+ --list ".\LINK\STM32_3.map" -o ".\out\STM32_3.2_LCD.axf"

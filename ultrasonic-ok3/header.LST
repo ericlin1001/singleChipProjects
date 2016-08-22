@@ -1,0 +1,46 @@
+C51 COMPILER V9.01   HEADER                                                                08/31/2013 13:24:07 PAGE 1   
+
+
+C51 COMPILER V9.01, COMPILATION OF MODULE HEADER
+OBJECT MODULE PLACED IN header.OBJ
+COMPILER INVOKED BY: J:\Keil\C51\BIN\C51.EXE header.c BROWSE DEBUG OBJECTEXTEND TABS(2)
+
+line level    source
+
+   1          #include "header.h"
+   2          void delayus(u16 us){while(us--);}
+   3          void delayms(u16 ms){
+   4   1        uchar j=0;
+   5   1        while(ms--){j=130;while(j--);}
+   6   1      }
+   7          void delays(u16 s){
+   8   1        while(s--)delayms(1000);
+   9   1      }
+  10          void delay(u16 ms){
+  11   1        delayms(ms);
+  12   1      }
+  13          
+  14          uchar bit_inv(uchar ch){
+  15   1        uchar res=0;
+  16   1        uchar i=0;
+  17   1        for(i=0;i<8;i++){
+  18   2          res<<=1;
+  19   2          res+=ch&0x01;
+  20   2          ch>>=1;
+  21   2        }
+  22   1        return res;
+  23   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =     85    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

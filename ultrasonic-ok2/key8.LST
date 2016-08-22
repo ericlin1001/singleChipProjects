@@ -1,0 +1,49 @@
+C51 COMPILER V9.01   KEY8                                                                  09/05/2013 10:40:07 PAGE 1   
+
+
+C51 COMPILER V9.01, COMPILATION OF MODULE KEY8
+OBJECT MODULE PLACED IN key8.OBJ
+COMPILER INVOKED BY: J:\Keil\C51\BIN\C51.EXE key8.c BROWSE DEBUG OBJECTEXTEND TABS(2)
+
+line level    source
+
+   1          #include "header.h"
+   2          //#include "led.h"
+   3          #include "key8.h"
+   4          /***********************key***************/
+   5          static uchar keyPressCount[8];
+   6          static uchar lastKeys=0xff;
+   7          void processKey(){
+   8   1        uchar curKeys=Keys;
+   9   1        uchar i;
+  10   1        lastKeys=lastKeys & ~curKeys;//trigger by press down.
+  11   1        for(i=0;i<8;i++){
+  12   2          if(lastKeys & (1<<i)){
+  13   3            keyPressCount[i]++;
+  14   3            if(keyPressCount[i]>KEY_COUNT_MAX*2)keyPressCount[i]=KEY_COUNT_MAX;
+  15   3          }
+  16   2        }
+  17   1        lastKeys=curKeys;
+  18   1      }
+  19          
+  20          BOOL isKeyPress(uchar i){
+  21   1        if(keyPressCount[i]>0){
+  22   2          keyPressCount[i]--;
+  23   2          return TRUE;
+  24   2        }
+  25   1        return FALSE;
+  26   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =     69    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =      9    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

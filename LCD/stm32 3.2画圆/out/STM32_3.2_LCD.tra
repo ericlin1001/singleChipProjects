@@ -1,0 +1,23 @@
+*** Creating Trace Output File '.\out\STM32_3.2_LCD.tra' Ok.
+### Preparing for ADS-LD.
+### Creating ADS-LD Command Line
+### List of Objects: adding '".\out\main.o"'
+### List of Objects: adding '".\out\touch.o"'
+### List of Objects: adding '".\out\stm32f10x.o"'
+### List of Objects: adding '".\out\lcd.o"'
+### List of Objects: adding '".\STM32F10xR.LIB"'
+### ADS-LD Command completed:
+--device DARMSTM ".\out\main.o" ".\out\touch.o" ".\out\stm32f10x.o" ".\out\lcd.o" ".\STM32F10xR.LIB" --strict --scatter ".\out\STM32_3.2_LCD.sct" 
+--autoat --summary_stderr --info summarysizes --map --xref --callgraph --symbols 
+--info sizes --info totals --info unused --info veneers 
+ --list ".\LINK\STM32_3.map" -o ".\out\STM32_3.2_LCD.axf"### Preparing Environment (PrepEnvAds)
+### ADS-LD Output File: '.\out\STM32_3.2_LCD.axf'
+### ADS-LD Command File: '.\out\STM32_3.2_LCD.lnp'
+### Checking for dirty Components...
+### Creating CmdFile '.\out\STM32_3.2_LCD.lnp', Handle=0x000004AC
+### Writing '.lnp' file
+### ADS-LD Command file '.\out\STM32_3.2_LCD.lnp' is ready.
+### ADS-LD: About to start ADS-LD Thread.
+### ADS-LD: executed with 0 errors
+### Updating obj list
+### LDADS_file() completed.

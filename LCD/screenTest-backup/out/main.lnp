@@ -1,0 +1,5 @@
+--cpu Cortex-M3 ".\out\main.o" ".\out\lcd.o" ".\out\stm32f10x_vector.o" ".\out\stm32f10x_it.o" ".\out\header.o" J:\Keil\ARM\RV31\LIB\ST\STM32F10xR.LIB 
+--strict --scatter ".\out\main.sct" 
+--summary_stderr --info summarysizes --map --xref --callgraph --symbols 
+--info sizes --info totals --info unused --info veneers 
+ --list ".\LINK\main.map" -o .\out\main.axf

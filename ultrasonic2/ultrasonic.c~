@@ -1,0 +1,7 @@
+#include "ultrasonic.h"
+void ultrasonicInit(){
+
+}
+void ultrasonicTrigger(){
+
+}

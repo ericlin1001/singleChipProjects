@@ -1,0 +1,279 @@
+C51 COMPILER V9.01   MAIN                                                                  08/31/2013 14:58:30 PAGE 1   
+
+
+C51 COMPILER V9.01, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN main.OBJ
+COMPILER INVOKED BY: J:\Keil\C51\BIN\C51.EXE main.c BROWSE DEBUG OBJECTEXTEND TABS(2)
+
+line level    source
+
+   1          #include "header.h"
+   2          #include "d7led.h"
+   3          #include "algorithm.h"
+   4          #include "ultrasonic.h"
+   5          
+   6          
+   7          #define EXT1
+   8          #define ULTRA1
+   9          #define TIM1
+  10          
+  11          TimeType timeBuffer1[Buffer_len];
+  12          uchar pBuffer1=0;//point to the current data.
+  13          
+  14          /*
+  15            len(mm)*100/17=time(us)
+  16          */
+  17          
+  18          /**************
+  19            program restriction:
+  20            detect distance:2cm~11m
+  21           ***/
+  22          
+  23          ulong showNum=0;
+  24          
+  25          static uchar isWaitForData0=0;
+  26          static uchar countForResend0=0;
+  27          static uchar isReceivingData0=0; 
+  28          
+  29          static uchar isWaitForData1=0;
+  30          static uchar countForResend1=0;
+  31          static uchar isReceivingData1=0; 
+  32          
+  33          void ultrasonicOk0(TimeType durTime);
+  34          void ultrasonicOk1(TimeType durTime);
+  35          
+  36          static void init(){
+  37   1        ENABLE_ALL_INT;
+  38   1      
+  39   1        ENABLE_TIMER1;
+  40   1        TIMER1_INIT(TIMER_GATE(1)|TIMER_TC(0)|TIMER_MODE(1));
+  41   1        TIMER1_STOP;
+  42   1      
+  43   1        ENABLE_TIMER0;
+  44   1        //TIMER0_INIT(TIMER_GATE(1)|TIMER_TC(0)|TIMER_MODE(1));
+  45   1        TMOD=(TIMER_GATE(1)|TIMER_TC(0)|TIMER_MODE(1))|(TIMER_GATE(1)|TIMER_TC(0)|TIMER_MODE(1))<<4;
+  46   1        TIMER0_STOP;
+  47   1        //
+  48   1        DISABLE_EXTINT1;
+  49   1        DISABLE_EXTINT0;
+  50   1        EXTINT1_MODE_TRIG(1);//negative edge trigger.
+  51   1        EXTINT0_MODE_TRIG(1);
+  52   1      }
+  53          
+  54          
+  55          timer1() interrupt 3  
+C51 COMPILER V9.01   MAIN                                                                  08/31/2013 14:58:30 PAGE 2   
+
+  56          {
+  57   1        //Error!!!!
+  58   1        isWaitForData1=0;
+  59   1        TIMER1_STOP;
+  60   1        DISABLE_EXTINT1;
+  61   1      }
+  62          
+  63          timer0() interrupt 1
+  64          {
+  65   1        //Error!!!!
+  66   1        isWaitForData0=0;
+  67   1        TIMER0_STOP;
+  68   1        DISABLE_EXTINT0;
+  69   1      }
+  70          
+  71          void ultrasonicInit(){
+  72   1        ULTRA1_TRIG_PIN=0;
+  73   1        ULTRA0_TRIG_PIN=0;
+  74   1      }
+  75          
+  76          void ultrasonicTrigger0(){
+  77   1        //had better be reinvoked after    60ms
+  78   1        //keep a 10us, high level 
+  79   1        //using timer1 to count the time.
+  80   1        uchar i;
+  81   1        #define MAX_COUNTFORRESEND 10
+  82   1        if(isWaitForData0){
+  83   2          //it means ,the last time data haven't recevied!.
+  84   2          countForResend0++;
+  85   2          if(countForResend0>=MAX_COUNTFORRESEND){
+  86   3            countForResend0=0;
+  87   3            isWaitForData0=0;
+  88   3          }
+  89   2        }else{
+  90   2          //normally trigger the ultrasonic.
+  91   2          isWaitForData0=1;
+  92   2        
+  93   2          TIMER0_SET(65536);
+  94   2          TIMER0_START;//however,it only count for 
+  95   2      
+  96   2          
+  97   2          /****start trigger****/
+  98   2        
+  99   2          ULTRA0_TRIG_PIN=1;//keep high level for 10us.
+ 100   2          for(i=0;i<5;i++);
+ 101   2          ULTRA0_TRIG_PIN=0;
+ 102   2      
+ 103   2          /****end trigger******/
+ 104   2      
+ 105   2          /***start receive***/
+ 106   2          ENABLE_EXTINT0;
+ 107   2        }
+ 108   1      }
+ 109          
+ 110          void ultrasonicTrigger1(){
+ 111   1        //had better be reinvoked after    60ms
+ 112   1        //keep a 10us, high level 
+ 113   1        //using timer1 to count the time.
+ 114   1        uchar i;
+ 115   1        if(isWaitForData1){
+ 116   2          //it means ,the last time data haven't recevied!.
+ 117   2          countForResend1++;
+C51 COMPILER V9.01   MAIN                                                                  08/31/2013 14:58:30 PAGE 3   
+
+ 118   2          if(countForResend1>=MAX_COUNTFORRESEND){
+ 119   3            countForResend1=0;
+ 120   3            isWaitForData1=0;
+ 121   3          }
+ 122   2        }else{
+ 123   2          //normally trigger the ultrasonic.
+ 124   2          isWaitForData1=1;
+ 125   2        
+ 126   2          TIMER1_SET(65536);
+ 127   2          TIMER1_START;//however,it only count for 
+ 128   2        
+ 129   2          /****start trigger****/
+ 130   2          ULTRA1_TRIG_PIN=1;//keep high level for 10us.
+ 131   2          for(i=0;i<5;i++);
+ 132   2          ULTRA1_TRIG_PIN=0;
+ 133   2      
+ 134   2          /****end trigger******/
+ 135   2      
+ 136   2          /***start receive***/
+ 137   2          ENABLE_EXTINT1;
+ 138   2        }
+ 139   1      }
+ 140          
+ 141          
+ 142          void ultrasonicReceive0(){
+ 143   1        u16 temp=0;
+ 144   1        if(!isReceivingData0 && isWaitForData0){//to avoid reenter this function!.
+ 145   2          isReceivingData0=1;
+ 146   2          /******save the time used to timeAfterUltrasonic****/
+ 147   2          temp=TH0;
+ 148   2          temp<<=8;
+ 149   2          temp|=TL0;
+ 150   2          if(temp<10){
+ 151   3            isReceivingData0=0;
+ 152   3            return;
+ 153   3          }
+ 154   2          /****stop timer1,and externel INT!****/
+ 155   2          TIMER0_STOP;
+ 156   2          DISABLE_EXTINT0;
+ 157   2          ultrasonicOk0(temp);
+ 158   2          isReceivingData0=0;
+ 159   2          isWaitForData0=0;
+ 160   2        }
+ 161   1      }
+ 162          
+ 163          void ultrasonicReceive1(){
+ 164   1        u16 temp=0;
+ 165   1        if(!isReceivingData1 && isWaitForData1){//to avoid reenter this function!.
+ 166   2          isReceivingData1=1;
+ 167   2          /******save the time used to timeAfterUltrasonic****/
+ 168   2          temp=TH1;
+ 169   2          temp<<=8;
+ 170   2          temp|=TL1;
+ 171   2          if(temp<10){
+ 172   3            isReceivingData1=0;
+ 173   3            return;
+ 174   3          }
+ 175   2          /****stop timer1,and externel INT!****/
+ 176   2          TIMER1_STOP;
+ 177   2          DISABLE_EXTINT1;
+ 178   2          ultrasonicOk1(temp);
+ 179   2          isReceivingData1=0;
+C51 COMPILER V9.01   MAIN                                                                  08/31/2013 14:58:30 PAGE 4   
+
+ 180   2          isWaitForData1=0;
+ 181   2        }
+ 182   1      }
+ 183          
+ 184          void initBuffer(){
+ 185   1        //take care of the init value.
+ 186   1        uchar i;
+ 187   1        for(i=0;i<Buffer_len;i++){
+ 188   2          timeBuffer1[i]=0;
+ 189   2        }
+ 190   1      
+ 191   1      }
+ 192          
+ 193          
+ 194          void showDistance1(u16 time){
+ 195   1      showNum=(ulong)(time*17/100)*10000+(showNum%10000);
+ 196   1      D7LED_show(showNum);
+ 197   1      }
+ 198          void showDistance0(u16 time){
+ 199   1      showNum=(time*17/100)+(showNum/10000*10000);
+ 200   1      D7LED_show(showNum);
+ 201   1      }
+ 202          
+ 203          void ultrasonicOk0(TimeType durTime){
+ 204   1        //the time is in var:timeAfterUltrasonic.
+ 205   1        //this will be invoked whenever we have received the ultrasonic echo.
+ 206   1        //showDistance(timeAfterUltrasonic);
+ 207   1        //filterData(timeBuffer1,durTime,&pBuffer1);
+ 208   1        //showDistance(timeBuffer1[pBuffer1],0);
+ 209   1        showDistance0(durTime);
+ 210   1      }
+ 211          void ultrasonicOk1(TimeType durTime){
+ 212   1        //the time is in var:timeAfterUltrasonic.
+ 213   1        //this will be invoked whenever we have received the ultrasonic echo.
+ 214   1        //showDistance(timeAfterUltrasonic);
+ 215   1        //filterData(timeBuffer1,durTime,&pBuffer1);
+ 216   1        //showDistance(timeBuffer1[pBuffer1],0);
+ 217   1        showDistance1(durTime);
+ 218   1      }
+ 219          
+ 220          externlInt0() interrupt 0
+ 221          {
+ 222   1        ultrasonicReceive0();
+ 223   1      } 
+ 224          
+ 225          
+ 226          externlInt1() interrupt 2
+ 227          {
+ 228   1        ultrasonicReceive1();
+ 229   1      } 
+ 230          
+ 231          void test(){
+ 232   1        while(1){
+ 233   2          ultrasonicTrigger0();
+ 234   2          ultrasonicTrigger1();
+ 235   2          D7LED_refresh();
+ 236   2          //delayms(20);
+ 237   2          delayms(2);
+ 238   2        }
+ 239   1      }
+ 240          
+ 241          void main(void){
+C51 COMPILER V9.01   MAIN                                                                  08/31/2013 14:58:30 PAGE 5   
+
+ 242   1        D7LED_show(12345678);
+ 243   1        init();
+ 244   1        initBuffer();
+ 245   1        delayms(1000);
+ 246   1        test();
+ 247   1        while(1);
+ 248   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    573    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =     19       2
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

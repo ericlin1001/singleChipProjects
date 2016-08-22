@@ -1,0 +1,7 @@
+"STARTUP.obj",
+"ultrasonic.obj",
+"header.obj",
+"algorithm.obj",
+"main.obj" 
+TO "ultrasonic" 
+RAMSIZE(256) 

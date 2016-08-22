@@ -1,0 +1,80 @@
+C51 COMPILER V9.01   ALGORITHM                                                             08/31/2013 16:52:22 PAGE 1   
+
+
+C51 COMPILER V9.01, COMPILATION OF MODULE ALGORITHM
+OBJECT MODULE PLACED IN algorithm.OBJ
+COMPILER INVOKED BY: J:\Keil\C51\BIN\C51.EXE algorithm.c BROWSE DEBUG OBJECTEXTEND TABS(2)
+
+line level    source
+
+   1          #include "algorithm.h"
+   2          /****************algorithm***********************/
+   3          static void swap(QuickSortType *a,int i,int j){*(a+i)^=*(a+j)^=*(a+i)^=*(a+j);}
+   4          s16 min(s16 a,s16 b){return a>b?b:a;}
+   5          s16 max(s16 a,s16 b){return a>b?a:b;}
+   6          void quicksort(QuickSortType *array, int n)
+   7          {
+   8   1        if(n>1){
+   9   2          int pivot=0,j;
+  10   2          for(j=1;j<n;j++)
+  11   2            if(array[j]<array[0])
+  12   2              swap(array,++pivot,j);
+  13   2          if(pivot!=0)swap(array,0,pivot);
+  14   2          quicksort(array,pivot);
+  15   2          quicksort(array+pivot+1,n-pivot-1);
+  16   2        }
+  17   1      }
+  18          void copyArr(QuickSortType *from,QuickSortType *to,int n){
+  19   1        while(n--)*to++=*from++;
+  20   1      }
+  21          //long abs(long a){if(a<0)return -a;return a;}
+  22          long abs2(long a,long b){if(a>b)return a-b;return b-a;}
+  23          char sign(long a){if(a>0)return 1;if(a<0)return -1;return 0;}
+  24          ulong sumArr(ulong *arr,uchar size){
+  25   1        uchar i,temp=0;
+  26   1        for(i=0;i<size;i++)temp+=arr[i];
+  27   1        return temp;
+  28   1      }
+  29          TimeType filterData(TimeType timeBuffer[],TimeType curTime,uchar *ppBuffer){
+  30   1        s16 a,b,c,d;
+  31   1        s16 mind,maxd;
+  32   1        s16 t;
+  33   1        //
+  34   1        a=timeBuffer[((*ppBuffer)+Buffer_len-2)%Buffer_len];
+  35   1        b=timeBuffer[((*ppBuffer)+Buffer_len-1)%Buffer_len];
+  36   1        c=timeBuffer[*ppBuffer];
+  37   1        d=curTime;
+  38   1        //now,check the value of d and correct it.
+  39   1        mind=-MAX_K+c;
+  40   1        maxd=MAX_K+c;
+  41   1        if((b-a)*(c-b)>0){
+  42   2          //restrict the second order differnce....
+  43   2          t=2*c-b;  
+  44   2          mind=max(mind,-MAX_K2+t);
+  45   2          maxd=min(maxd,MAX_K2+t);
+  46   2        }
+  47   1        if(d>maxd)d=maxd;
+  48   1        if(d<mind)d=mind;
+  49   1        //
+  50   1        (*ppBuffer)++;
+  51   1        (*ppBuffer)%=Buffer_len;
+  52   1        timeBuffer[*ppBuffer]=d;
+  53   1        return d;
+  54   1      }
+  55          /****************end algorithm***********************/
+C51 COMPILER V9.01   ALGORITHM                                                             08/31/2013 16:52:22 PAGE 2   
+
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =   1009    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----      60
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

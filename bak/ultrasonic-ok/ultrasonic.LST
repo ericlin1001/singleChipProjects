@@ -1,0 +1,81 @@
+C51 COMPILER V9.01   ULTRASONIC                                                            08/15/2013 13:04:08 PAGE 1   
+
+
+C51 COMPILER V9.01, COMPILATION OF MODULE ULTRASONIC
+OBJECT MODULE PLACED IN ultrasonic.OBJ
+COMPILER INVOKED BY: J:\Keil\C51\BIN\C51.EXE ultrasonic.c BROWSE DEBUG OBJECTEXTEND TABS(2)
+
+line level    source
+
+   1          
+   2          #include "d7led.h"
+   3          #include "ultrasonic.h"
+   4          //****for count the time used by ultrasonic************
+   5          
+   6          
+   7          /************init....***/
+   8          /*
+   9          void initTimer(){
+  10            TMOD=0x91; // as 16bit-counter.
+  11            //close all T1,T0
+  12            TR0=0;
+  13            TR1=0;
+  14          }*//*
+  15          void initExternelInt(){
+  16            IT0=1;    //1: is negative edged triggered.  
+  17            IT1=1;    //1: is negative edged triggered.  
+  18          }*/
+  19          /*
+  20          void initInterrupt(){
+  21            initTimer();
+  22            //initExternelInt();
+  23            //enable timer T1,T0
+  24            ET0=1;
+  25            ET1=1;
+  26            //disable externel interrupt INT1,INT0
+  27            EX0=0;
+  28            EX1=0;
+  29            //disable serial INT
+  30            ES=0;
+  31            //enable all interrupt.
+  32            EA=1;
+  33          
+  34          }*/
+  35          /*
+  36          void init(){
+  37            initInterrupt();
+  38            initUltrasonic();
+  39          }*/
+  40          
+  41          
+  42          /************init....***/
+  43          
+  44          /******************counting and gathering data from ultrasonic,save data to :timeAfterUltrasonic**********
+             -****/
+  45          /*timer1() interrupt 3  
+  46          {
+  47            timeAfterUltrasonic+=0x10000;
+  48            //continue count the time....
+  49            TH1=0;
+  50            TL1=0;
+  51          }*/
+  52          
+  53          
+  54          /******************end counting and gathering data from ultrasonic**************/
+C51 COMPILER V9.01   ULTRASONIC                                                            08/15/2013 13:04:08 PAGE 2   
+
+  55          
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =   ----    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

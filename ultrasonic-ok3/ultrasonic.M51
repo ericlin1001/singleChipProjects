@@ -1,0 +1,971 @@
+BL51 BANKED LINKER/LOCATER V6.22                                                        09/13/2013  14:32:35  PAGE 1
+
+
+BL51 BANKED LINKER/LOCATER V6.22, INVOKED BY:
+J:\KEIL\C51\BIN\BL51.EXE STARTUP.obj, ultrasonic.obj, header.obj, algorithm.obj, main.obj, key8.obj TO ultrasonic RAMSIZ
+>> E (256)
+
+
+MEMORY MODEL: SMALL
+
+
+INPUT MODULES INCLUDED:
+  STARTUP.obj (?C_STARTUP)
+  ultrasonic.obj (ULTRASONIC)
+  header.obj (HEADER)
+  algorithm.obj (ALGORITHM)
+  main.obj (MAIN)
+  key8.obj (KEY8)
+  J:\KEIL\C51\LIB\C51S.LIB (?C_INIT)
+  J:\KEIL\C51\LIB\C51S.LIB (?C?CLDPTR)
+  J:\KEIL\C51\LIB\C51S.LIB (?C?CILDPTR)
+  J:\KEIL\C51\LIB\C51S.LIB (?C?CSTPTR)
+  J:\KEIL\C51\LIB\C51S.LIB (?C?IMUL)
+  J:\KEIL\C51\LIB\C51S.LIB (?C?UIDIV)
+  J:\KEIL\C51\LIB\C51S.LIB (?C?SIDIV)
+  J:\KEIL\C51\LIB\C51S.LIB (?C?ILDPTR)
+  J:\KEIL\C51\LIB\C51S.LIB (?C?ILDOPTR)
+  J:\KEIL\C51\LIB\C51S.LIB (?C?ISTPTR)
+  J:\KEIL\C51\LIB\C51S.LIB (?C?ISTOPTR)
+  J:\KEIL\C51\LIB\C51S.LIB (?C?SLCMP)
+  J:\KEIL\C51\LIB\C51S.LIB (?C?LLDOPTR)
+  J:\KEIL\C51\LIB\C51S.LIB (RAND)
+  J:\KEIL\C51\LIB\C51S.LIB (?C?LLDIDATA)
+  J:\KEIL\C51\LIB\C51S.LIB (?C?LLDXDATA)
+  J:\KEIL\C51\LIB\C51S.LIB (?C?LLDPDATA)
+  J:\KEIL\C51\LIB\C51S.LIB (?C?LLDCODE)
+
+
+LINK MAP OF MODULE:  ultrasonic (?C_STARTUP)
+
+
+            TYPE    BASE      LENGTH    RELOCATION   SEGMENT NAME
+            -----------------------------------------------------
+
+            * * * * * * *   D A T A   M E M O R Y   * * * * * * *
+            REG     0000H     0008H     ABSOLUTE     "REG BANK 0"
+            DATA    0008H     0016H     UNIT         _DATA_GROUP_
+            DATA    001EH     0012H     UNIT         ?DT?_FILTERDATA?ALGORITHM
+            DATA    0030H     0011H     UNIT         ?DT?MAIN
+            DATA    0041H     0009H     UNIT         ?DT?_QUICKSORT?ALGORITHM
+            DATA    004AH     0009H     UNIT         ?DT?KEY8
+            DATA    0053H     0008H     UNIT         ?DT?_COPYARR?ALGORITHM
+            DATA    005BH     0008H     UNIT         ?DT?_ABS2?ALGORITHM
+            DATA    0063H     0007H     UNIT         ?DT?_SWAP?ALGORITHM
+            DATA    006AH     0006H     UNIT         ?DT?_SUMARR?ALGORITHM
+            DATA    0070H     0004H     UNIT         ?DT?_SIGN?ALGORITHM
+            DATA    0074H     0004H     UNIT         ?DT?RAND?RAND
+            IDATA   0078H     0001H     UNIT         ?STACK
+
+            * * * * * * *   C O D E   M E M O R Y   * * * * * * *
+            CODE    0000H     0003H     ABSOLUTE     
+BL51 BANKED LINKER/LOCATER V6.22                                                      09/13/2013  14:32:35  PAGE 2
+
+
+            CODE    0003H     0003H     ABSOLUTE     
+            CODE    0006H     0005H     UNIT         ?PR?ULTRASONICINIT?MAIN
+            CODE    000BH     0003H     ABSOLUTE     
+            CODE    000EH     0003H     UNIT         ?PR?_DELAY?HEADER
+                    0011H     0002H                  *** GAP ***
+            CODE    0013H     0003H     ABSOLUTE     
+                    0016H     0005H                  *** GAP ***
+            CODE    001BH     0003H     ABSOLUTE     
+            CODE    001EH     0213H     UNIT         ?C?LIB_CODE
+            CODE    0231H     015EH     UNIT         ?PR?_FILTERDATA?ALGORITHM
+            CODE    038FH     00CEH     UNIT         ?PR?CONTROLLER?MAIN
+            CODE    045DH     00CCH     UNIT         ?PR?_QUICKSORT?ALGORITHM
+            CODE    0529H     00B2H     UNIT         ?PR?_SWAP?ALGORITHM
+            CODE    05DBH     008CH     UNIT         ?C_C51STARTUP
+            CODE    0667H     0088H     UNIT         ?PR?_DOMOTOR?MAIN
+            CODE    06EFH     0058H     UNIT         ?PR?TIMER1?MAIN
+            CODE    0747H     0058H     UNIT         ?PR?TIMER0?MAIN
+            CODE    079FH     004DH     UNIT         ?PR?RAND?RAND
+            CODE    07ECH     0049H     UNIT         ?PR?_ABS2?ALGORITHM
+            CODE    0835H     0043H     UNIT         ?PR?MAIN?MAIN
+            CODE    0878H     0042H     UNIT         ?PR?_COPYARR?ALGORITHM
+            CODE    08BAH     003BH     UNIT         ?PR?EXTERNLINT0?MAIN
+            CODE    08F5H     003BH     UNIT         ?PR?EXTERNLINT1?MAIN
+            CODE    0930H     0039H     UNIT         ?PR?ULTRASONICRECEIVE0?MAIN
+            CODE    0969H     0039H     UNIT         ?PR?ULTRASONICRECEIVE1?MAIN
+            CODE    09A2H     0038H     UNIT         ?PR?_SUMARR?ALGORITHM
+            CODE    09DAH     0036H     UNIT         ?PR?PROCESSKEY?KEY8
+            CODE    0A10H     0033H     UNIT         ?PR?_DOANGLE?MAIN
+            CODE    0A43H     002DH     UNIT         ?PR?TT?MAIN
+            CODE    0A70H     002BH     UNIT         ?PR?TESTTURNMOTOR?MAIN
+            CODE    0A9BH     002BH     UNIT         ?C_INITSEG
+            CODE    0AC6H     002AH     UNIT         ?PR?_SIGN?ALGORITHM
+            CODE    0AF0H     002AH     UNIT         ?PR?_MYDELAY?MAIN
+            CODE    0B1AH     0029H     UNIT         ?PR?ULTRASONICTRIGGER0?MAIN
+            CODE    0B43H     0029H     UNIT         ?PR?ULTRASONICTRIGGER1?MAIN
+            CODE    0B6CH     001BH     UNIT         ?PR?_DELAYS?HEADER
+            CODE    0B87H     0018H     UNIT         ?PR?ERROR?MAIN
+            CODE    0B9FH     0017H     UNIT         ?PR?_BIT_INV?HEADER
+            CODE    0BB6H     0016H     UNIT         ?PR?INIT?MAIN
+            CODE    0BCCH     0015H     UNIT         ?PR?_DELAYMS?HEADER
+            CODE    0BE1H     0014H     UNIT         ?PR?_MIN?ALGORITHM
+            CODE    0BF5H     0014H     UNIT         ?PR?_MAX?ALGORITHM
+            CODE    0C09H     000FH     UNIT         ?PR?_ISKEYPRESS?KEY8
+            CODE    0C18H     000BH     UNIT         ?PR?_DELAYUS?HEADER
+            CODE    0C23H     0007H     UNIT         ?PR?_ULTRASONICOK1?MAIN
+            CODE    0C2AH     0007H     UNIT         ?PR?_ULTRASONICOK0?MAIN
+
+
+
+OVERLAY MAP OF MODULE:   ultrasonic (?C_STARTUP)
+
+
+SEGMENT                               DATA_GROUP 
+  +--> CALLED SEGMENT               START    LENGTH
+---------------------------------------------------
+?C_C51STARTUP                       -----    -----
+  +--> ?PR?MAIN?MAIN
+BL51 BANKED LINKER/LOCATER V6.22                                                      09/13/2013  14:32:35  PAGE 3
+
+
+  +--> ?C_INITSEG
+
+?PR?MAIN?MAIN                       0008H    0002H
+  +--> ?PR?INIT?MAIN
+  +--> ?PR?_DOMOTOR?MAIN
+  +--> ?PR?_MYDELAY?MAIN
+  +--> ?PR?ULTRASONICTRIGGER0?MAIN
+  +--> ?PR?ULTRASONICTRIGGER1?MAIN
+
+?PR?_DOMOTOR?MAIN                   001AH    0004H
+  +--> ?PR?RAND?RAND
+
+?PR?_MYDELAY?MAIN                   -----    -----
+  +--> ?PR?_DOANGLE?MAIN
+
+*** NEW ROOT ***************************************************
+
+?PR?TIMER1?MAIN                     -----    -----
+  +--> ?PR?TT?MAIN
+
+?PR?TT?MAIN                         -----    -----
+  +--> ?PR?ERROR?MAIN
+
+?PR?ERROR?MAIN                      -----    -----
+  +--> ?PR?_DOMOTOR?MAIN
+  +--> ?PR?_DOANGLE?MAIN
+
+*** NEW ROOT ***************************************************
+
+?PR?TIMER0?MAIN                     -----    -----
+  +--> ?PR?TT?MAIN
+
+*** NEW ROOT ***************************************************
+
+?PR?EXTERNLINT0?MAIN                -----    -----
+  +--> ?PR?ULTRASONICRECEIVE0?MAIN
+
+?PR?ULTRASONICRECEIVE0?MAIN         -----    -----
+  +--> ?PR?_ULTRASONICOK0?MAIN
+
+?PR?_ULTRASONICOK0?MAIN             -----    -----
+  +--> ?PR?TT?MAIN
+
+*** NEW ROOT ***************************************************
+
+?PR?EXTERNLINT1?MAIN                -----    -----
+  +--> ?PR?ULTRASONICRECEIVE1?MAIN
+
+?PR?ULTRASONICRECEIVE1?MAIN         -----    -----
+  +--> ?PR?_ULTRASONICOK1?MAIN
+
+?PR?_ULTRASONICOK1?MAIN             -----    -----
+  +--> ?PR?TT?MAIN
+
+
+
+SYMBOL TABLE OF MODULE:  ultrasonic (?C_STARTUP)
+BL51 BANKED LINKER/LOCATER V6.22                                                      09/13/2013  14:32:35  PAGE 4
+
+
+
+  VALUE           TYPE          NAME
+  ----------------------------------
+
+  -------         MODULE        ?C_STARTUP
+  C:05DBH         SEGMENT       ?C_C51STARTUP
+  I:0078H         SEGMENT       ?STACK
+  C:0000H         PUBLIC        ?C_STARTUP
+  D:00E0H         SYMBOL        ACC
+  D:00F0H         SYMBOL        B
+  D:0083H         SYMBOL        DPH
+  D:0082H         SYMBOL        DPL
+  N:0000H         SYMBOL        IBPSTACK
+  N:0100H         SYMBOL        IBPSTACKTOP
+  N:0080H         SYMBOL        IDATALEN
+  C:05DEH         SYMBOL        IDATALOOP
+  N:0000H         SYMBOL        PBPSTACK
+  N:0100H         SYMBOL        PBPSTACKTOP
+  N:0000H         SYMBOL        PDATALEN
+  N:0000H         SYMBOL        PDATASTART
+  N:0000H         SYMBOL        PPAGE
+  N:0000H         SYMBOL        PPAGEENABLE
+  D:00A0H         SYMBOL        PPAGE_SFR
+  D:0081H         SYMBOL        SP
+  C:05DBH         SYMBOL        STARTUP1
+  N:0000H         SYMBOL        XBPSTACK
+  N:0000H         SYMBOL        XBPSTACKTOP
+  N:0000H         SYMBOL        XDATALEN
+  N:0000H         SYMBOL        XDATASTART
+  C:0000H         LINE#         126
+  C:05DBH         LINE#         133
+  C:05DDH         LINE#         134
+  C:05DEH         LINE#         135
+  C:05DFH         LINE#         136
+  C:05E1H         LINE#         185
+  C:05E4H         LINE#         196
+  -------         ENDMOD        ?C_STARTUP
+
+  -------         MODULE        ULTRASONIC
+  C:0000H         SYMBOL        _ICE_DUMMY_
+  -------         ENDMOD        ULTRASONIC
+
+  -------         MODULE        HEADER
+  C:0000H         SYMBOL        _ICE_DUMMY_
+  D:0080H         PUBLIC        P0
+  D:0090H         PUBLIC        P1
+  D:00A0H         PUBLIC        P2
+  D:00B0H         PUBLIC        P3
+  C:0B6CH         PUBLIC        _delays
+  C:000EH         PUBLIC        _delay
+  C:0B9FH         PUBLIC        _bit_inv
+  C:0BCCH         PUBLIC        _delayms
+  C:0C18H         PUBLIC        _delayus
+  -------         PROC          _DELAYUS
+  D:0006H         SYMBOL        us
+  C:0C18H         LINE#         2
+  -------         ENDPROC       _DELAYUS
+BL51 BANKED LINKER/LOCATER V6.22                                                      09/13/2013  14:32:35  PAGE 5
+
+
+  -------         PROC          _DELAYMS
+  D:0006H         SYMBOL        ms
+  -------         DO            
+  D:0005H         SYMBOL        j
+  -------         ENDDO         
+  C:0BCCH         LINE#         3
+  C:0BCCH         LINE#         4
+  C:0BCCH         LINE#         5
+  C:0BE0H         LINE#         6
+  -------         ENDPROC       _DELAYMS
+  -------         PROC          _DELAYS
+  D:0082H         SYMBOL        s
+  C:0B6CH         LINE#         7
+  C:0B70H         LINE#         8
+  C:0B86H         LINE#         9
+  -------         ENDPROC       _DELAYS
+  -------         PROC          _DELAY
+  D:0006H         SYMBOL        ms
+  C:000EH         LINE#         10
+  C:000EH         LINE#         11
+  -------         ENDPROC       _DELAY
+  -------         PROC          _BIT_INV
+  D:0007H         SYMBOL        ch
+  -------         DO            
+  D:0006H         SYMBOL        res
+  D:0005H         SYMBOL        i
+  -------         ENDDO         
+  C:0B9FH         LINE#         14
+  C:0B9FH         LINE#         15
+  C:0BA1H         LINE#         16
+  C:0BA2H         LINE#         17
+  C:0BA2H         LINE#         18
+  C:0BA6H         LINE#         19
+  C:0BABH         LINE#         20
+  C:0BAFH         LINE#         21
+  C:0BB3H         LINE#         22
+  C:0BB5H         LINE#         23
+  -------         ENDPROC       _BIT_INV
+  -------         ENDMOD        HEADER
+
+  -------         MODULE        ALGORITHM
+  C:0000H         SYMBOL        _ICE_DUMMY_
+  D:0080H         PUBLIC        P0
+  D:0090H         PUBLIC        P1
+  D:00A0H         PUBLIC        P2
+  D:00B0H         PUBLIC        P3
+  C:0231H         PUBLIC        _filterData
+  C:0AC6H         PUBLIC        _sign
+  C:0529H         SYMBOL        _swap
+  C:0BE1H         PUBLIC        _min
+  C:0BF5H         PUBLIC        _max
+  C:0878H         PUBLIC        _copyArr
+  C:07ECH         PUBLIC        _abs2
+  C:045DH         PUBLIC        _quicksort
+  C:09A2H         PUBLIC        _sumArr
+  -------         PROC          _SWAP
+  D:0063H         SYMBOL        a
+BL51 BANKED LINKER/LOCATER V6.22                                                      09/13/2013  14:32:35  PAGE 6
+
+
+  D:0066H         SYMBOL        i
+  D:0068H         SYMBOL        j
+  C:0529H         LINE#         3
+  -------         ENDPROC       _SWAP
+  -------         PROC          _MIN
+  D:0006H         SYMBOL        a
+  D:0004H         SYMBOL        b
+  C:0BE1H         LINE#         4
+  -------         ENDPROC       _MIN
+  -------         PROC          _MAX
+  D:0006H         SYMBOL        a
+  D:0004H         SYMBOL        b
+  C:0BF5H         LINE#         5
+  -------         ENDPROC       _MAX
+  -------         PROC          _QUICKSORT
+  D:0041H         SYMBOL        array
+  D:0044H         SYMBOL        n
+  -------         DO            
+  D:0046H         SYMBOL        pivot
+  D:0048H         SYMBOL        j
+  -------         ENDDO         
+  C:045DH         LINE#         6
+  C:0467H         LINE#         7
+  C:0467H         LINE#         8
+  C:0477H         LINE#         9
+  C:047CH         LINE#         10
+  C:0492H         LINE#         11
+  C:04B6H         LINE#         12
+  C:04D4H         LINE#         13
+  C:04ECH         LINE#         14
+  C:04F9H         LINE#         15
+  C:0528H         LINE#         16
+  C:0528H         LINE#         17
+  -------         ENDPROC       _QUICKSORT
+  -------         PROC          _COPYARR
+  D:0053H         SYMBOL        from
+  D:0056H         SYMBOL        to
+  D:0059H         SYMBOL        n
+  C:0878H         LINE#         18
+  C:087EH         LINE#         19
+  C:08B9H         LINE#         20
+  -------         ENDPROC       _COPYARR
+  -------         PROC          _ABS2
+  D:005BH         SYMBOL        a
+  D:005FH         SYMBOL        b
+  C:07ECH         LINE#         22
+  -------         ENDPROC       _ABS2
+  -------         PROC          _SIGN
+  D:0070H         SYMBOL        a
+  C:0AC6H         LINE#         23
+  -------         ENDPROC       _SIGN
+  -------         PROC          _SUMARR
+  D:006AH         SYMBOL        arr
+  D:006DH         SYMBOL        size
+  -------         DO            
+  D:006EH         SYMBOL        i
+  D:006FH         SYMBOL        temp
+BL51 BANKED LINKER/LOCATER V6.22                                                      09/13/2013  14:32:35  PAGE 7
+
+
+  -------         ENDDO         
+  C:09A2H         LINE#         24
+  C:09AAH         LINE#         25
+  C:09ADH         LINE#         26
+  C:09D3H         LINE#         27
+  C:09D9H         LINE#         28
+  -------         ENDPROC       _SUMARR
+  -------         PROC          _FILTERDATA
+  D:001EH         SYMBOL        timeBuffer
+  D:0004H         SYMBOL        curTime
+  D:0023H         SYMBOL        ppBuffer
+  -------         DO            
+  D:0026H         SYMBOL        a
+  D:0028H         SYMBOL        b
+  D:002AH         SYMBOL        c
+  D:002CH         SYMBOL        d
+  D:0002H         SYMBOL        mind
+  D:0082H         SYMBOL        maxd
+  D:002EH         SYMBOL        t
+  -------         ENDDO         
+  C:0231H         LINE#         29
+  C:0237H         LINE#         34
+  C:0262H         LINE#         35
+  C:027EH         LINE#         36
+  C:02A4H         LINE#         37
+  C:02A8H         LINE#         39
+  C:02B2H         LINE#         40
+  C:02BFH         LINE#         41
+  C:02E3H         LINE#         43
+  C:02F7H         LINE#         44
+  C:030CH         LINE#         45
+  C:0321H         LINE#         46
+  C:0321H         LINE#         47
+  C:0338H         LINE#         48
+  C:034BH         LINE#         50
+  C:0356H         LINE#         51
+  C:035EH         LINE#         52
+  C:038AH         LINE#         53
+  C:038EH         LINE#         54
+  -------         ENDPROC       _FILTERDATA
+  -------         ENDMOD        ALGORITHM
+
+  -------         MODULE        MAIN
+  C:0000H         SYMBOL        _ICE_DUMMY_
+  D:0080H         PUBLIC        P0
+  D:0090H         PUBLIC        P1
+  D:00A0H         PUBLIC        P2
+  D:00B0H         PUBLIC        P3
+  C:0A70H         PUBLIC        testTurnMotor
+  B:00A8H.7       PUBLIC        EA
+  D:0030H         PUBLIC        angle
+  B:0080H.0       PUBLIC        P0_0
+  D:0032H         PUBLIC        isBacking
+  B:0090H.0       PUBLIC        P1_0
+  B:0080H.1       PUBLIC        P0_1
+  B:0090H.1       PUBLIC        P1_1
+  B:0090H.2       PUBLIC        P1_2
+BL51 BANKED LINKER/LOCATER V6.22                                                      09/13/2013  14:32:35  PAGE 8
+
+
+  D:0033H         PUBLIC        speed
+  B:0090H.3       PUBLIC        P1_3
+  D:0035H         PUBLIC        t0
+  D:0037H         PUBLIC        t1
+  C:0835H         PUBLIC        main
+  C:0B87H         PUBLIC        error
+  D:0039H         SYMBOL        isReceivingData0
+  D:003AH         SYMBOL        isReceivingData1
+  D:0089H         PUBLIC        TMOD
+  C:0BB6H         SYMBOL        init
+  C:0C2AH         PUBLIC        _ultrasonicOk0
+  C:0C23H         PUBLIC        _ultrasonicOk1
+  C:0A10H         PUBLIC        _doAngle
+  C:0930H         PUBLIC        ultrasonicReceive0
+  C:0969H         PUBLIC        ultrasonicReceive1
+  B:00A8H.1       PUBLIC        ET0
+  B:00A8H.3       PUBLIC        ET1
+  C:038FH         PUBLIC        controller
+  D:003BH         SYMBOL        isWaitForData0
+  D:003CH         SYMBOL        isWaitForData1
+  D:008CH         PUBLIC        TH0
+  B:00A8H.0       PUBLIC        EX0
+  B:0088H.0       PUBLIC        IT0
+  D:008DH         PUBLIC        TH1
+  B:00A8H.2       PUBLIC        EX1
+  B:0088H.2       PUBLIC        IT1
+  D:008AH         PUBLIC        TL0
+  D:008BH         PUBLIC        TL1
+  C:0747H         PUBLIC        timer0
+  C:0B1AH         PUBLIC        ultrasonicTrigger0
+  C:06EFH         PUBLIC        timer1
+  C:0B43H         PUBLIC        ultrasonicTrigger1
+  B:0088H.4       PUBLIC        TR0
+  B:0088H.6       PUBLIC        TR1
+  D:003DH         PUBLIC        isTuring
+  D:003EH         PUBLIC        isLeft_back
+  C:0006H         PUBLIC        ultrasonicInit
+  C:08BAH         PUBLIC        externlInt0
+  C:08F5H         PUBLIC        externlInt1
+  C:066EH         PUBLIC        _doMotor
+  C:0A43H         PUBLIC        tt
+  D:003FH         SYMBOL        countForResend0
+  D:0040H         SYMBOL        countForResend1
+  C:0AF7H         PUBLIC        _mydelay
+  -------         PROC          INIT
+  C:0BB6H         LINE#         35
+  C:0BB6H         LINE#         36
+  C:0BB8H         LINE#         38
+  C:0BBAH         LINE#         40
+  C:0BBCH         LINE#         42
+  C:0BBEH         LINE#         44
+  C:0BC1H         LINE#         45
+  C:0BC3H         LINE#         47
+  C:0BC5H         LINE#         48
+  C:0BC7H         LINE#         49
+  C:0BC9H         LINE#         50
+  C:0BCBH         LINE#         51
+BL51 BANKED LINKER/LOCATER V6.22                                                      09/13/2013  14:32:35  PAGE 9
+
+
+  -------         ENDPROC       INIT
+  -------         PROC          TIMER1
+  C:06EFH         LINE#         54
+  C:070CH         LINE#         57
+  C:070FH         LINE#         58
+  C:0711H         LINE#         59
+  C:0713H         LINE#         60
+  C:0729H         LINE#         61
+  C:072CH         LINE#         62
+  -------         ENDPROC       TIMER1
+  -------         PROC          TIMER0
+  C:0747H         LINE#         64
+  C:0764H         LINE#         67
+  C:0767H         LINE#         68
+  C:0769H         LINE#         69
+  C:076BH         LINE#         70
+  C:0781H         LINE#         71
+  C:0784H         LINE#         72
+  -------         ENDPROC       TIMER0
+  -------         PROC          ULTRASONICINIT
+  C:0006H         LINE#         74
+  C:0006H         LINE#         75
+  C:0008H         LINE#         76
+  C:000AH         LINE#         77
+  -------         ENDPROC       ULTRASONICINIT
+  -------         PROC          ULTRASONICTRIGGER0
+  -------         DO            
+  D:0007H         SYMBOL        i
+  -------         ENDDO         
+  C:0B1AH         LINE#         79
+  C:0B1AH         LINE#         85
+  C:0B1EH         LINE#         87
+  C:0B20H         LINE#         88
+  C:0B27H         LINE#         89
+  C:0B2AH         LINE#         90
+  C:0B2CH         LINE#         91
+  C:0B2CH         LINE#         92
+  C:0B2DH         LINE#         94
+  C:0B30H         LINE#         96
+  C:0B35H         LINE#         97
+  C:0B37H         LINE#         101
+  C:0B39H         LINE#         102
+  C:0B3EH         LINE#         103
+  C:0B40H         LINE#         108
+  C:0B42H         LINE#         109
+  C:0B42H         LINE#         110
+  -------         ENDPROC       ULTRASONICTRIGGER0
+  -------         PROC          ULTRASONICTRIGGER1
+  -------         DO            
+  D:0007H         SYMBOL        i
+  -------         ENDDO         
+  C:0B43H         LINE#         112
+  C:0B43H         LINE#         117
+  C:0B47H         LINE#         119
+  C:0B49H         LINE#         120
+  C:0B50H         LINE#         121
+  C:0B53H         LINE#         122
+BL51 BANKED LINKER/LOCATER V6.22                                                      09/13/2013  14:32:35  PAGE 10
+
+
+  C:0B55H         LINE#         123
+  C:0B55H         LINE#         124
+  C:0B56H         LINE#         126
+  C:0B59H         LINE#         128
+  C:0B5EH         LINE#         129
+  C:0B60H         LINE#         132
+  C:0B62H         LINE#         133
+  C:0B67H         LINE#         134
+  C:0B69H         LINE#         136
+  C:0B6BH         LINE#         139
+  C:0B6BH         LINE#         140
+  -------         ENDPROC       ULTRASONICTRIGGER1
+  -------         PROC          ULTRASONICRECEIVE0
+  -------         DO            
+  D:0006H         SYMBOL        temp
+  -------         ENDDO         
+  C:0930H         LINE#         141
+  C:0930H         LINE#         142
+  C:0930H         LINE#         143
+  C:0938H         LINE#         144
+  C:093BH         LINE#         146
+  C:093DH         LINE#         147
+  C:093FH         LINE#         148
+  C:0943H         LINE#         149
+  C:094CH         LINE#         150
+  C:0950H         LINE#         152
+  C:0950H         LINE#         154
+  C:0952H         LINE#         155
+  C:0954H         LINE#         156
+  C:0963H         LINE#         157
+  C:0966H         LINE#         158
+  C:0968H         LINE#         159
+  C:0968H         LINE#         160
+  -------         ENDPROC       ULTRASONICRECEIVE0
+  -------         PROC          ULTRASONICRECEIVE1
+  -------         DO            
+  D:0006H         SYMBOL        temp
+  -------         ENDDO         
+  C:0969H         LINE#         162
+  C:0969H         LINE#         163
+  C:0969H         LINE#         164
+  C:0971H         LINE#         165
+  C:0974H         LINE#         167
+  C:0976H         LINE#         168
+  C:0978H         LINE#         169
+  C:097CH         LINE#         170
+  C:0985H         LINE#         171
+  C:0989H         LINE#         173
+  C:0989H         LINE#         175
+  C:098BH         LINE#         176
+  C:098DH         LINE#         177
+  C:099CH         LINE#         178
+  C:099FH         LINE#         179
+  C:09A1H         LINE#         180
+  C:09A1H         LINE#         181
+  -------         ENDPROC       ULTRASONICRECEIVE1
+  -------         PROC          EXTERNLINT0
+BL51 BANKED LINKER/LOCATER V6.22                                                      09/13/2013  14:32:35  PAGE 11
+
+
+  C:08BAH         LINE#         183
+  C:08D7H         LINE#         185
+  C:08DAH         LINE#         186
+  -------         ENDPROC       EXTERNLINT0
+  -------         PROC          EXTERNLINT1
+  C:08F5H         LINE#         188
+  C:0912H         LINE#         190
+  C:0915H         LINE#         191
+  -------         ENDPROC       EXTERNLINT1
+  -------         PROC          _ULTRASONICOK1
+  D:0006H         SYMBOL        durTime
+  C:0C23H         LINE#         194
+  C:0C23H         LINE#         196
+  C:0C27H         LINE#         197
+  -------         ENDPROC       _ULTRASONICOK1
+  -------         PROC          _ULTRASONICOK0
+  D:0006H         SYMBOL        durTime
+  C:0C2AH         LINE#         199
+  C:0C2AH         LINE#         201
+  C:0C2EH         LINE#         202
+  -------         ENDPROC       _ULTRASONICOK0
+  C:0AF0H         SYMBOL        L?0093
+  -------         PROC          L?0092
+  -------         ENDPROC       L?0092
+  C:0AF0H         SYMBOL        L?0093
+  -------         PROC          _MYDELAY
+  D:0006H         SYMBOL        us
+  -------         DO            
+  D:0004H         SYMBOL        a
+  D:0005H         SYMBOL        b
+  -------         ENDDO         
+  C:0AF7H         LINE#         210
+  C:0AF7H         LINE#         211
+  C:0AF7H         LINE#         213
+  C:0B00H         LINE#         214
+  C:0B0AH         LINE#         215
+  C:0B12H         LINE#         216
+  C:0B19H         LINE#         217
+  C:0B19H         LINE#         218
+  -------         ENDPROC       _MYDELAY
+  -------         PROC          _DOANGLE
+  D:0082H         SYMBOL        a
+  -------         DO            
+  D:0003H         SYMBOL        i
+  -------         ENDDO         
+  C:0A10H         LINE#         221
+  C:0A14H         LINE#         222
+  C:0A16H         LINE#         223
+  C:0A21H         LINE#         224
+  C:0A27H         LINE#         225
+  C:0A29H         LINE#         226
+  C:0A30H         LINE#         227
+  C:0A32H         LINE#         228
+  C:0A40H         LINE#         229
+  C:0A42H         LINE#         230
+  -------         ENDPROC       _DOANGLE
+  -------         PROC          TESTTURNMOTOR
+BL51 BANKED LINKER/LOCATER V6.22                                                      09/13/2013  14:32:35  PAGE 12
+
+
+  C:0A70H         LINE#         232
+  C:0A70H         LINE#         233
+  C:0A70H         LINE#         234
+  C:0A77H         LINE#         235
+  C:0A7EH         LINE#         236
+  C:0A85H         LINE#         237
+  C:0A8CH         LINE#         238
+  C:0A92H         LINE#         239
+  C:0A99H         LINE#         240
+  -------         ENDPROC       TESTTURNMOTOR
+  -------         PROC          L?0094
+  -------         ENDPROC       L?0094
+  -------         PROC          _DOMOTOR
+  D:001AH         SYMBOL        speed
+  D:001CH         SYMBOL        times
+  C:066EH         LINE#         250
+  C:0676H         LINE#         251
+  C:067FH         LINE#         252
+  C:068AH         LINE#         254
+  C:0697H         LINE#         255
+  C:06B0H         LINE#         256
+  C:06B4H         LINE#         257
+  C:06B6H         LINE#         258
+  C:06BAH         LINE#         259
+  C:06BAH         LINE#         260
+  C:06BCH         LINE#         261
+  C:06BCH         LINE#         263
+  C:06C9H         LINE#         264
+  C:06E2H         LINE#         265
+  C:06E6H         LINE#         266
+  C:06E8H         LINE#         267
+  C:06ECH         LINE#         268
+  C:06ECH         LINE#         269
+  C:06EEH         LINE#         270
+  C:06EEH         LINE#         276
+  -------         ENDPROC       _DOMOTOR
+  -------         PROC          CONTROLLER
+  -------         DO            
+  D:0006H         SYMBOL        newAngle
+  -------         ENDDO         
+  C:038FH         LINE#         284
+  C:038FH         LINE#         285
+  C:0392H         LINE#         286
+  C:0398H         LINE#         287
+  C:0398H         LINE#         288
+  C:03A7H         LINE#         290
+  C:03AAH         LINE#         291
+  C:03B0H         LINE#         292
+  C:03C1H         LINE#         293
+  C:03D3H         LINE#         294
+  C:03D6H         LINE#         295
+  C:03E1H         LINE#         297
+  C:03E5H         LINE#         298
+  C:03E7H         LINE#         300
+  C:03EBH         LINE#         301
+  C:03EBH         LINE#         302
+  C:03F9H         LINE#         303
+BL51 BANKED LINKER/LOCATER V6.22                                                      09/13/2013  14:32:35  PAGE 13
+
+
+  C:03FBH         LINE#         306
+  C:040AH         LINE#         308
+  C:040DH         LINE#         309
+  C:0413H         LINE#         310
+  C:0417H         LINE#         311
+  C:0425H         LINE#         312
+  C:0432H         LINE#         313
+  C:0438H         LINE#         314
+  C:043CH         LINE#         315
+  C:043EH         LINE#         316
+  C:0444H         LINE#         317
+  C:0447H         LINE#         318
+  C:0447H         LINE#         319
+  C:0447H         LINE#         320
+  C:0451H         LINE#         321
+  C:0455H         LINE#         322
+  C:045CH         LINE#         323
+  C:045CH         LINE#         324
+  -------         ENDPROC       CONTROLLER
+  -------         PROC          ERROR
+  C:0B87H         LINE#         326
+  C:0B87H         LINE#         328
+  C:0B89H         LINE#         329
+  C:0B89H         LINE#         330
+  C:0B8CH         LINE#         331
+  C:0B93H         LINE#         332
+  C:0B96H         LINE#         333
+  C:0B9DH         LINE#         334
+  -------         ENDPROC       ERROR
+  -------         PROC          TT
+  C:0A43H         LINE#         338
+  C:0A43H         LINE#         340
+  C:0A6FH         LINE#         341
+  -------         ENDPROC       TT
+  -------         PROC          MAIN
+  -------         DO            
+  D:0008H         SYMBOL        a
+  -------         ENDDO         
+  C:0835H         LINE#         345
+  C:0835H         LINE#         346
+  C:083AH         LINE#         347
+  C:083DH         LINE#         350
+  C:0843H         LINE#         351
+  C:084DH         LINE#         352
+  C:0851H         LINE#         353
+  C:0854H         LINE#         354
+  C:0858H         LINE#         355
+  C:085BH         LINE#         356
+  C:085EH         LINE#         357
+  C:0861H         LINE#         358
+  C:0861H         LINE#         359
+  C:0863H         LINE#         361
+  C:0866H         LINE#         362
+  C:0869H         LINE#         363
+  C:086BH         LINE#         364
+  C:0876H         LINE#         365
+  -------         ENDPROC       MAIN
+BL51 BANKED LINKER/LOCATER V6.22                                                      09/13/2013  14:32:35  PAGE 14
+
+
+  -------         ENDMOD        MAIN
+
+  -------         MODULE        KEY8
+  C:0000H         SYMBOL        _ICE_DUMMY_
+  D:0080H         PUBLIC        P0
+  D:0090H         PUBLIC        P1
+  D:00A0H         PUBLIC        P2
+  D:00B0H         PUBLIC        P3
+  C:0C09H         PUBLIC        _isKeyPress
+  C:09DAH         PUBLIC        processKey
+  D:004AH         SYMBOL        lastKeys
+  D:004BH         SYMBOL        keyPressCount
+  -------         PROC          PROCESSKEY
+  -------         DO            
+  D:0005H         SYMBOL        curKeys
+  D:0004H         SYMBOL        i
+  -------         ENDDO         
+  C:09DAH         LINE#         7
+  C:09DAH         LINE#         8
+  C:09DCH         LINE#         10
+  C:09E0H         LINE#         11
+  C:09E2H         LINE#         12
+  C:09F8H         LINE#         13
+  C:09FDH         LINE#         14
+  C:0A09H         LINE#         15
+  C:0A09H         LINE#         16
+  C:0A0DH         LINE#         17
+  C:0A0FH         LINE#         18
+  -------         ENDPROC       PROCESSKEY
+  -------         PROC          _ISKEYPRESS
+  D:0007H         SYMBOL        i
+  C:0C09H         LINE#         20
+  C:0C09H         LINE#         21
+  C:0C13H         LINE#         22
+  C:0C14H         LINE#         23
+  C:0C16H         LINE#         24
+  C:0C16H         LINE#         25
+  C:0C17H         LINE#         26
+  -------         ENDPROC       _ISKEYPRESS
+  -------         ENDMOD        KEY8
+
+  -------         MODULE        ?C?CLDPTR
+  C:001EH         PUBLIC        ?C?CLDPTR
+  -------         ENDMOD        ?C?CLDPTR
+
+  -------         MODULE        ?C?CILDPTR
+  C:0037H         PUBLIC        ?C?CILDPTR
+  -------         ENDMOD        ?C?CILDPTR
+
+  -------         MODULE        ?C?CSTPTR
+  C:0059H         PUBLIC        ?C?CSTPTR
+  -------         ENDMOD        ?C?CSTPTR
+
+  -------         MODULE        ?C?IMUL
+  C:006BH         PUBLIC        ?C?IMUL
+  -------         ENDMOD        ?C?IMUL
+
+BL51 BANKED LINKER/LOCATER V6.22                                                      09/13/2013  14:32:35  PAGE 15
+
+
+  -------         MODULE        ?C?UIDIV
+  C:007DH         PUBLIC        ?C?UIDIV
+  -------         ENDMOD        ?C?UIDIV
+
+  -------         MODULE        ?C?SIDIV
+  C:00D2H         PUBLIC        ?C?SIDIV
+  -------         ENDMOD        ?C?SIDIV
+
+  -------         MODULE        ?C?ILDPTR
+  C:0108H         PUBLIC        ?C?ILDPTR
+  -------         ENDMOD        ?C?ILDPTR
+
+  -------         MODULE        ?C?ILDOPTR
+  C:0133H         PUBLIC        ?C?ILDOPTR
+  -------         ENDMOD        ?C?ILDOPTR
+
+  -------         MODULE        ?C?ISTPTR
+  C:016BH         PUBLIC        ?C?ISTPTR
+  -------         ENDMOD        ?C?ISTPTR
+
+  -------         MODULE        ?C?ISTOPTR
+  C:018AH         PUBLIC        ?C?ISTOPTR
+  -------         ENDMOD        ?C?ISTOPTR
+
+  -------         MODULE        ?C?SLCMP
+  C:01B7H         PUBLIC        ?C?SLCMP
+  -------         ENDMOD        ?C?SLCMP
+
+  -------         MODULE        ?C?LLDOPTR
+  C:01CDH         PUBLIC        ?C?LLDOPTR
+  -------         ENDMOD        ?C?LLDOPTR
+
+  -------         MODULE        RAND
+  D:0074H         PUBLIC        ?SRAND?BYTE
+  C:079FH         PUBLIC        RAND
+  C:07E1H         PUBLIC        _SRAND
+  -------         ENDMOD        RAND
+
+  -------         MODULE        ?C?LLDIDATA
+  C:01FDH         PUBLIC        ?C?LLDIDATA
+  -------         ENDMOD        ?C?LLDIDATA
+
+  -------         MODULE        ?C?LLDXDATA
+  C:0209H         PUBLIC        ?C?LLDXDATA
+  -------         ENDMOD        ?C?LLDXDATA
+
+  -------         MODULE        ?C?LLDPDATA
+  C:0215H         PUBLIC        ?C?LLDPDATA
+  -------         ENDMOD        ?C?LLDPDATA
+
+  -------         MODULE        ?C?LLDCODE
+  C:0221H         PUBLIC        ?C?LLDCODE
+  -------         ENDMOD        ?C?LLDCODE
+
+*** WARNING L16: UNCALLED SEGMENT, IGNORED FOR OVERLAY PROCESS
+    SEGMENT: ?PR?_DELAYUS?HEADER
+
+BL51 BANKED LINKER/LOCATER V6.22                                                      09/13/2013  14:32:35  PAGE 16
+
+
+*** WARNING L16: UNCALLED SEGMENT, IGNORED FOR OVERLAY PROCESS
+    SEGMENT: ?PR?_DELAYS?HEADER
+
+*** WARNING L16: UNCALLED SEGMENT, IGNORED FOR OVERLAY PROCESS
+    SEGMENT: ?PR?_DELAY?HEADER
+
+*** WARNING L16: UNCALLED SEGMENT, IGNORED FOR OVERLAY PROCESS
+    SEGMENT: ?PR?_BIT_INV?HEADER
+
+*** WARNING L16: UNCALLED SEGMENT, IGNORED FOR OVERLAY PROCESS
+    SEGMENT: ?PR?_QUICKSORT?ALGORITHM
+
+*** WARNING L16: UNCALLED SEGMENT, IGNORED FOR OVERLAY PROCESS
+    SEGMENT: ?PR?_COPYARR?ALGORITHM
+
+*** WARNING L16: UNCALLED SEGMENT, IGNORED FOR OVERLAY PROCESS
+    SEGMENT: ?PR?_ABS2?ALGORITHM
+
+*** WARNING L16: UNCALLED SEGMENT, IGNORED FOR OVERLAY PROCESS
+    SEGMENT: ?PR?_SIGN?ALGORITHM
+
+*** WARNING L16: UNCALLED SEGMENT, IGNORED FOR OVERLAY PROCESS
+    SEGMENT: ?PR?_SUMARR?ALGORITHM
+
+*** WARNING L16: UNCALLED SEGMENT, IGNORED FOR OVERLAY PROCESS
+    SEGMENT: ?PR?_FILTERDATA?ALGORITHM
+
+*** WARNING L16: UNCALLED SEGMENT, IGNORED FOR OVERLAY PROCESS
+    SEGMENT: ?PR?ULTRASONICINIT?MAIN
+
+*** WARNING L16: UNCALLED SEGMENT, IGNORED FOR OVERLAY PROCESS
+    SEGMENT: ?PR?TESTTURNMOTOR?MAIN
+
+*** WARNING L16: UNCALLED SEGMENT, IGNORED FOR OVERLAY PROCESS
+    SEGMENT: ?PR?CONTROLLER?MAIN
+
+*** WARNING L16: UNCALLED SEGMENT, IGNORED FOR OVERLAY PROCESS
+    SEGMENT: ?PR?PROCESSKEY?KEY8
+
+*** WARNING L16: UNCALLED SEGMENT, IGNORED FOR OVERLAY PROCESS
+    SEGMENT: ?PR?_ISKEYPRESS?KEY8
+
+*** WARNING L15: MULTIPLE CALL TO SEGMENT
+    SEGMENT: ?PR?_DOMOTOR?MAIN
+    CALLER1: ?C_C51STARTUP
+    CALLER2: ?PR?TIMER1?MAIN
+
+*** WARNING L15: MULTIPLE CALL TO SEGMENT
+    SEGMENT: ?PR?_DOMOTOR?MAIN
+    CALLER1: ?PR?TIMER1?MAIN
+    CALLER2: ?PR?TIMER0?MAIN
+
+*** WARNING L15: MULTIPLE CALL TO SEGMENT
+    SEGMENT: ?PR?_DOMOTOR?MAIN
+    CALLER1: ?PR?TIMER0?MAIN
+    CALLER2: ?PR?EXTERNLINT0?MAIN
+
+BL51 BANKED LINKER/LOCATER V6.22                                                      09/13/2013  14:32:35  PAGE 17
+
+
+*** WARNING L15: MULTIPLE CALL TO SEGMENT
+    SEGMENT: ?PR?_DOMOTOR?MAIN
+    CALLER1: ?PR?EXTERNLINT0?MAIN
+    CALLER2: ?PR?EXTERNLINT1?MAIN
+
+Program Size: data=121.0 xdata=0 code=3114
+LINK/LOCATE RUN COMPLETE.  19 WARNING(S),  0 ERROR(S)

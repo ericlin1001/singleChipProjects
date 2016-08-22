@@ -1,0 +1,95 @@
+#include "entry.h"
+#include "flash.h"
+#include "led.h"
+//config GPIOA:output push-pull 
+//config GPIOB:input floating
+
+#define ShowStage(n) D7LED_show(n);delay(1000);
+
+void init(){
+	sysTickInit();
+	delay(100);
+	//registerTick(D7LED_refresh,1000/50/8);
+	//inform user board is OK!.
+	//D7LED_show(88888888);delay(1000);
+}
+void wait(){while(1);}
+
+/****************************/
+void useBoard(){//this should invoked once .
+#define FLASH_MAGIC 0x55aa 
+	FLASH_init();
+	//FLASH_selectPage(0);
+	if(FLASH_get(0)==FLASH_MAGIC){
+		FLASH_set(1,FLASH_get(1)+1);
+	}else{
+		FLASH_set(0,FLASH_MAGIC);
+		FLASH_set(1,1);
+	}
+	FLASH_flush();
+}
+u32 getUseTimes(){
+	if(FLASH_get(0)==FLASH_MAGIC){
+		return FLASH_get(1);
+	}
+	return 1;
+}
+void testFlash(){
+	//this show the time you power on the board.
+	useBoard();
+	D7LED_show(getUseTimes());delay(1000);
+}
+/*************************/
+
+void testGPIO(){
+
+	GPIO_InitTypeDef GPIO_InitStructure;
+
+	//config GPIOA:output push-pull 
+  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_All; //select all pin
+  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;  //output push-pull 
+  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz; //I/O speed =50Hz
+   GPIO_Init(GPIOB, &GPIO_InitStructure);  //set GPIOA
+  
+	//config GPIOB:input floating 
+  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_All ;  //select all pin
+  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING;  //input floating 
+  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz; //I/O speed =50Hz
+  GPIO_Init(GPIOA, &GPIO_InitStructure);  //set GPIOB
+
+}
+u8 getBit(u32 v,u8 i){
+if( v&((u32)(1<<i))==0){
+	return 0;
+}
+return 1;
+}
+void test(u32 v){
+	u32 out;
+	out=0;
+	out=getBit(v,0)<<2+getBit(v,1)<<0+getBit(v,2)<<1;
+	out|=v&0xf8;
+	out<<=8;
+	GPIO_Write(GPIOA,out);
+
+}
+void entry(void){
+	u32 i=0;
+	init();
+	//testGPIO();
+	//testFlash();
+	
+	while(1){
+		test(0xf8);
+		delay(1000);
+	}
+	wait();
+	while(1)
+	//GPIO_Write(GPIOB,GPIO_ReadInputData(GPIOA));
+	GPIO_Write(GPIOA,GPIO_ReadInputData(GPIOB));
+	wait();
+	while(1){
+		delay(1000);
+		GPIO_Write(GPIOA,~GPIO_ReadOutputData(GPIOA));
+	}
+}
